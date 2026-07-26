@@ -99,6 +99,16 @@ a{color:var(--royal);text-decoration-color:var(--royal);text-underline-offset:3p
 
 .link-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;}
 
+/* ---------- experience timeline ---------- */
+.exp-item{padding:24px 0;border-bottom:1px solid var(--line);}
+.exp-item:last-child{border-bottom:none;}
+.exp-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:6px;}
+.exp-head .role{font-family:var(--pixel);font-weight:700;font-size:13px;}
+.exp-head .when{font-family:var(--pixel);font-size:9.5px;color:var(--stone);white-space:nowrap;}
+.exp-org{font-family:var(--serif);font-style:italic;font-size:14.5px;color:var(--teal-deep);margin:0 0 10px;}
+.exp-item ul{margin:0;padding-left:20px;}
+.exp-item li{font-family:var(--serif);font-size:15.5px;line-height:1.65;color:#232b28;margin-bottom:6px;}
+
 @media (max-width:640px){
   .site-header, .hero, .page-hero, .content{padding-left:20px;padding-right:20px;}
 }
