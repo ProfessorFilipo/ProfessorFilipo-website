@@ -20,12 +20,20 @@
       <a href="blog.html">BLOG</a>
       <a href="contato.html">CONTATO</a>
     </nav>
-    <a href="index.html" class="site-logo" aria-label="Filipo Novo Mór — página inicial">
-      <img src="assets/logo.png" alt="Logo pessoal — perfil de robô estilizado dentro de um círculo teal">
-    </a>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <div class="lang-switch">
+        <span class="current">PT-BR</span>
+        <span class="sep">/</span>
+        <a href="#" title="Versão em inglês em breve">EN-CA</a>
+      </div>
+      <a href="index.html" class="site-logo" aria-label="Filipo Novo Mór — página inicial">
+        <img src="assets/logo.png" alt="Logo pessoal — perfil de robô estilizado dentro de um círculo teal">
+      </a>
+    </div>
   </header>
 
   <div class="page-hero">
+    <p class="breadcrumb"><a href="index.html">INÍCIO</a><span class="sep">/</span>ENSINO</p>
     <p class="eyebrow">ENSINO</p>
     <h1>Graduação, orientação<br>e pós-graduação</h1>
     <p>Professor em Ciência da Computação e Engenharia de Software na PUCRS e Universidade La Salle.</p>
@@ -35,6 +43,7 @@
 
     <h2>DISCIPLINAS DE GRADUAÇÃO</h2>
     <div class="research-card">
+      <img class="card-icon" src="assets/icon-cap.svg" alt="" aria-hidden="true">
       <h3>Disciplinas ativas</h3>
       <p>Lógica para Computação, Práticas em Engenharia de Software (PUCRS), Organização e Arquitetura de Computadores e Gerência de Projetos (Unilasalle) — cada uma com materiais organizados por semestre.</p>
       <div class="link-row">
@@ -44,6 +53,7 @@
 
     <h2>ORIENTAÇÃO NA GRADUAÇÃO</h2>
     <div class="research-card">
+      <img class="card-icon" src="assets/icon-doc.svg" alt="" aria-hidden="true">
       <h3>TCC1 e TCC2</h3>
       <p>Orientação de trabalhos de conclusão de curso — planejamento (TCC1) e desenvolvimento/defesa (TCC2).</p>
       <div class="link-row">
@@ -53,6 +63,7 @@
 
     <h2>PÓS-GRADUAÇÃO</h2>
     <div class="research-card">
+      <img class="card-icon" src="assets/icon-seal.svg" alt="" aria-hidden="true">
       <h3>Orientação e parecer de monografias — PUCRS Online</h3>
       <p>Atuo como orientador e parecerista de monografias em diversos cursos de especialização na área de tecnologia e engenharia.</p>
       <div class="link-row">
@@ -61,9 +72,13 @@
     </div>
 
     <h2>MATERIAIS DE DISCIPLINAS ANTERIORES</h2>
-    <p>Materiais de disciplinas que já lecionei e não fazem mais parte da grade atual seguem disponíveis pra consulta.</p>
-    <div class="link-row">
-      <a class="btn ghost" href="ensino-materiais-anteriores.html">VER MATERIAIS →</a>
+    <div class="research-card">
+      <img class="card-icon" src="assets/icon-box.svg" alt="" aria-hidden="true">
+      <h3>Disciplinas descontinuadas</h3>
+      <p>Materiais de disciplinas que já lecionei e não fazem mais parte da grade atual seguem disponíveis pra consulta.</p>
+      <div class="link-row">
+        <a class="btn ghost" href="ensino-materiais-anteriores.html">VER MATERIAIS →</a>
+      </div>
     </div>
 
   </main>
