@@ -155,6 +155,13 @@ a{color:var(--royal);text-decoration-color:var(--royal);text-underline-offset:3p
 .slide-embed .caption{font-family:var(--serif);font-size:13px;color:var(--ink);margin:8px 0 2px;line-height:1.4;}
 .slide-embed .fallback-link{font-family:var(--serif);font-size:12px;}
 
+/* ---------- personal photo strip ---------- */
+.photo-strip{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0 6px;}
+.photo-strip img{
+  width:140px;height:140px;object-fit:cover;border:1.5px solid var(--ink);border-radius:4px;display:block;
+}
+.photo-strip-caption{font-family:var(--serif);font-style:italic;font-size:13px;color:var(--stone);margin:0 0 24px;}
+
 @media (max-width:640px){
   .site-header, .hero, .page-hero, .content{padding-left:20px;padding-right:20px;}
   .hero-grid{grid-template-columns:1fr;}
