@@ -162,20 +162,37 @@ a{color:var(--royal);text-decoration-color:var(--royal);text-underline-offset:3p
 }
 .photo-strip-caption{font-family:var(--serif);font-style:italic;font-size:13px;color:var(--stone);margin:0 0 24px;}
 
-/* ---------- retro web badges (home footer only, just for fun) ---------- */
-.retro-badges{padding:24px 40px;border-top:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+/* ---------- retro web badges + visit counter (home footer, side by side) ---------- */
+.retro-footer{
+  padding:24px 40px 32px;border-top:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
+}
+.retro-badges{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .retro-badges img{display:block;image-rendering:pixelated;}
 .retro-badges .label{font-family:var(--pixel);font-size:9px;color:var(--stone);width:100%;margin:0 0 4px;}
 
-/* ---------- retro visit counter (odometer style) ---------- */
-.visit-counter-wrap{padding:20px 40px 32px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+/* ---------- retro visit counter — real 7-segment LED digits ---------- */
+.visit-counter-wrap{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .counter-label{font-family:var(--pixel);font-size:9px;color:var(--stone);}
-.visit-counter{display:flex;gap:3px;}
-.counter-digit{
-  font-family:var(--pixel);font-weight:700;font-size:18px;color:var(--amber);
-  background:#1a1006;width:22px;text-align:center;padding:6px 0;border-radius:2px;
-  box-shadow:inset 0 2px 3px rgba(0,0,0,0.6), inset 0 -1px 0 rgba(255,255,255,0.08);
-  border:1px solid #000;
+.visit-counter{
+  display:flex;gap:3px;background:#0d0403;padding:6px 8px;border-radius:3px;
+  border:1px solid #000;box-shadow:inset 0 2px 4px rgba(0,0,0,0.7);
+}
+.led-digit{position:relative;width:16px;height:28px;}
+.led-digit span{position:absolute;background:#2a0605;border-radius:1px;transition:background .1s,box-shadow .1s;}
+.led-digit span.on{background:#ff2b1f;box-shadow:0 0 4px rgba(255,43,31,0.85);}
+.led-digit .seg-a,.led-digit .seg-g,.led-digit .seg-d{left:2px;width:12px;height:3px;}
+.led-digit .seg-a{top:0;}
+.led-digit .seg-g{top:12.5px;}
+.led-digit .seg-d{top:25px;}
+.led-digit .seg-f,.led-digit .seg-b,.led-digit .seg-e,.led-digit .seg-c{width:3px;height:11px;}
+.led-digit .seg-f{left:0;top:2px;}
+.led-digit .seg-b{left:13px;top:2px;}
+.led-digit .seg-e{left:0;top:15px;}
+.led-digit .seg-c{left:13px;top:15px;}
+
+@media (max-width:480px){
+  .retro-footer{flex-direction:column;align-items:flex-start;}
 }
 
 @media (max-width:640px){
