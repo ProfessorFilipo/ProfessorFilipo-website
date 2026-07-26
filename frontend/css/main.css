@@ -167,6 +167,17 @@ a{color:var(--royal);text-decoration-color:var(--royal);text-underline-offset:3p
 .retro-badges img{display:block;image-rendering:pixelated;}
 .retro-badges .label{font-family:var(--pixel);font-size:9px;color:var(--stone);width:100%;margin:0 0 4px;}
 
+/* ---------- retro visit counter (odometer style) ---------- */
+.visit-counter-wrap{padding:20px 40px 32px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.counter-label{font-family:var(--pixel);font-size:9px;color:var(--stone);}
+.visit-counter{display:flex;gap:3px;}
+.counter-digit{
+  font-family:var(--pixel);font-weight:700;font-size:18px;color:var(--amber);
+  background:#1a1006;width:22px;text-align:center;padding:6px 0;border-radius:2px;
+  box-shadow:inset 0 2px 3px rgba(0,0,0,0.6), inset 0 -1px 0 rgba(255,255,255,0.08);
+  border:1px solid #000;
+}
+
 @media (max-width:640px){
   .site-header, .hero, .page-hero, .content{padding-left:20px;padding-right:20px;}
   .hero-grid{grid-template-columns:1fr;}
