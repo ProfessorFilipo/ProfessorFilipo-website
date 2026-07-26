@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lógica para Computação — Filipo Novo Mór</title>
+<meta name="description" content="Materiais de Lógica para Computação — PUCRS. Provas, listas de exercícios de Prolog e árvores de refutação por semestre.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <nav class="main-nav" aria-label="Navegação principal">
+      <a href="sobre.html">SOBRE</a>
+      <a href="pesquisa.html">PESQUISA</a>
+      <a href="ensino.html">ENSINO</a>
+      <a href="ferramentas.html">FERRAMENTAS</a>
+      <a href="blog.html">BLOG</a>
+      <a href="contato.html">CONTATO</a>
+    </nav>
+    <a href="index.html" class="site-logo" aria-label="Filipo Novo Mór — página inicial">
+      <img src="assets/logo.png" alt="Logo pessoal — perfil de robô estilizado dentro de um círculo teal">
+    </a>
+  </header>
+
+  <div class="page-hero">
+    <p class="eyebrow">ENSINO / DISCIPLINAS — PUCRS</p>
+    <h1>Lógica para Computação</h1>
+    <p>Lógica proposicional e de predicados aplicada à computação — Prolog, árvores de refutação e resolução.</p>
+  </div>
+
+  <main class="content">
+
+    <!--
+      MODELO DE CONTEUDO: cada disciplina segue este padrao.
+      Para adicionar um novo semestre: (1) adicione um botao <button class="semester-tab">
+      com um data-target unico, (2) adicione um <div class="semester-panel"> correspondente
+      com o mesmo id. O primeiro semestre da lista fica "active" por padrao.
+      Troque os links de arquivo de exemplo (#) pelos arquivos reais em assets/materiais/logica/.
+    -->
+    <div class="semester-tabs">
+      <button class="semester-tab active" data-target="sem-2026-1">2026/I</button>
+      <button class="semester-tab" data-target="sem-2025-2">2025/II</button>
+      <button class="semester-tab" data-target="sem-2025-1">2025/I</button>
+      <button class="semester-tab" data-target="sem-2024-2">2024/II</button>
+    </div>
+
+    <div class="semester-panel active" id="sem-2026-1">
+      <ul class="material-list">
+        <li>Prova 1 <a class="file-link" href="#">PDF ↓</a></li>
+        <li>Lista de exercícios — Prolog <a class="file-link" href="#">PDF ↓</a></li>
+        <li>Gabarito comentado — árvores de refutação <a class="file-link" href="#">PDF ↓</a></li>
+      </ul>
+    </div>
+
+    <div class="semester-panel" id="sem-2025-2">
+      <ul class="material-list">
+        <li>Prova 1 <a class="file-link" href="#">PDF ↓</a></li>
+        <li>Prova 2 <a class="file-link" href="#">PDF ↓</a></li>
+      </ul>
+    </div>
+
+    <div class="semester-panel" id="sem-2025-1">
+      <ul class="material-list">
+        <li>Prova 1 <a class="file-link" href="#">PDF ↓</a></li>
+        <li>Prova 2 <a class="file-link" href="#">PDF ↓</a></li>
+      </ul>
+    </div>
+
+    <div class="semester-panel" id="sem-2024-2">
+      <ul class="material-list">
+        <li>Prova 1 <a class="file-link" href="#">PDF ↓</a></li>
+      </ul>
+    </div>
+
+  </main>
+
+  <footer class="api-status">
+    <span id="api-status-text">Verificando conexão com a API…</span>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/semester-tabs.js"></script>
+</body>
+</html>
