@@ -1,17 +1,18 @@
 /**
  * counter.js — retro 90s-style visit counter, rendered as real 7-segment
- * LED digits (CSS-drawn, not an image or font). Increments once per
- * browser session (via sessionStorage) by calling the backend, which
- * itself enforces a server-side rate limit — so the count can't be
- * inflated by a script bypassing the frontend entirely.
+ * LED digits (CSS-drawn, not an image or font).
+ *
+ * Behavior: increments once per browser session (POST /counter/hit) —
+ * but on every subsequent page load in that same session, it re-reads the
+ * current total (GET /counter/count, which never increments) so the
+ * displayed number always reflects the true current count, not a stale
+ * cached one from earlier in the session.
  */
 (function () {
-  const COUNT_KEY = "filipomor_visit_count";
+  const COUNTED_FLAG = "filipomor_counted";
   const container = document.getElementById("visit-counter-digits");
   if (!container) return;
 
-  // Segment order: a (top), b (top-right), c (bottom-right), d (bottom),
-  // e (bottom-left), f (top-left), g (middle). 1 = lit, 0 = unlit.
   const SEGMENTS = {
     "0": "1111110",
     "1": "0110000",
@@ -39,20 +40,17 @@
     container.innerHTML = digits.map(digitToHTML).join("");
   }
 
-  const cachedCount = sessionStorage.getItem(COUNT_KEY);
-  if (cachedCount !== null) {
-    renderDigits(cachedCount);
-    return;
-  }
+  const alreadyCounted = sessionStorage.getItem(COUNTED_FLAG) === "1";
+  const endpoint = alreadyCounted ? "/counter/count" : "/counter/hit";
+  const method = alreadyCounted ? "GET" : "POST";
 
-  fetch(`${API_BASE_URL}/counter/hit`, { method: "POST" })
+  fetch(`${API_BASE_URL}${endpoint}`, { method })
     .then((res) => res.json())
     .then((data) => {
-      sessionStorage.setItem(COUNT_KEY, data.count);
+      if (!alreadyCounted) sessionStorage.setItem(COUNTED_FLAG, "1");
       renderDigits(data.count);
     })
     .catch(() => {
-      // Fails quietly — a broken counter shouldn't break the rest of the page.
       renderDigits(0);
     });
 })();

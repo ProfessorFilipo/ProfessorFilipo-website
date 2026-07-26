@@ -38,3 +38,16 @@ def hit_counter(request: Request, db: Session = Depends(get_db)):
     new_count = int(result.scalar_one())
     db.commit()
     return {"count": new_count}
+
+
+@router.get("/count")
+@limiter.limit("30/minute")
+def read_counter(request: Request, db: Session = Depends(get_db)):
+    """Read-only — never increments. Used so repeat visits in the same
+    session still display the true current total, not a stale cached one."""
+    result = db.execute(
+        text("SELECT setting_value FROM settings WHERE setting_key = :key"),
+        {"key": COUNTER_KEY},
+    )
+    row = result.scalar_one_or_none()
+    return {"count": int(row) if row is not None else 0}
