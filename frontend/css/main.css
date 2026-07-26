@@ -162,6 +162,11 @@ a{color:var(--royal);text-decoration-color:var(--royal);text-underline-offset:3p
 }
 .photo-strip-caption{font-family:var(--serif);font-style:italic;font-size:13px;color:var(--stone);margin:0 0 24px;}
 
+/* ---------- retro web badges (home footer only, just for fun) ---------- */
+.retro-badges{padding:24px 40px;border-top:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.retro-badges img{display:block;image-rendering:pixelated;}
+.retro-badges .label{font-family:var(--pixel);font-size:9px;color:var(--stone);width:100%;margin:0 0 4px;}
+
 @media (max-width:640px){
   .site-header, .hero, .page-hero, .content{padding-left:20px;padding-right:20px;}
   .hero-grid{grid-template-columns:1fr;}
