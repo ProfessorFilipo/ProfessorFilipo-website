@@ -1,0 +1,30 @@
+# Credenciais reais - NUNCA versionar
+backend/.env
+.env
+.env.local
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# Node (frontend, se usar build tools)
+node_modules/
+dist/
+.wrangler/
+
+# Uploads locais de teste (arquivos de verdade vivem no R2)
+backend/local_uploads/
+
+# IDE
+.idea/
+.vscode/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
