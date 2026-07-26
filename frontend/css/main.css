@@ -145,6 +145,16 @@ a{color:var(--royal);text-decoration-color:var(--royal);text-underline-offset:3p
 .video-thumb img{width:100%;height:auto;display:block;border:1.5px solid var(--ink);border-radius:4px;}
 .video-thumb span{display:block;font-family:var(--serif);font-size:12.5px;color:var(--ink);margin-top:6px;line-height:1.4;}
 
+/* ---------- slideshare embeds ---------- */
+.slide-embed-row{display:flex;gap:20px;flex-wrap:wrap;margin:16px 0 8px;}
+.slide-embed{width:100%;max-width:427px;}
+.slide-embed-frame{
+  aspect-ratio:427/356;border:1.5px solid var(--ink);border-radius:4px;overflow:hidden;background:#fff;
+}
+.slide-embed-frame iframe{width:100%;height:100%;border:none;display:block;}
+.slide-embed .caption{font-family:var(--serif);font-size:13px;color:var(--ink);margin:8px 0 2px;line-height:1.4;}
+.slide-embed .fallback-link{font-family:var(--serif);font-size:12px;}
+
 @media (max-width:640px){
   .site-header, .hero, .page-hero, .content{padding-left:20px;padding-right:20px;}
   .hero-grid{grid-template-columns:1fr;}
