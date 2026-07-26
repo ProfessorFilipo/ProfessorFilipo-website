@@ -30,13 +30,16 @@ a{color:var(--royal);text-decoration-color:var(--royal);text-underline-offset:3p
 #boot-layer{
   position:fixed;inset:0;z-index:100;background:var(--crt-bg);color:var(--crt-fg);
   font-family:var(--pixel);font-size:14px;line-height:1.9;
-  padding:10vh 8vw;transition:opacity .6s ease;
+  padding:10vh 8vw;transition:opacity .6s ease;overflow:hidden;
 }
 #boot-layer.hidden{opacity:0;pointer-events:none;}
-.boot-line{white-space:pre;min-height:1.9em;}
+.boot-line{white-space:pre-wrap;word-break:break-word;min-height:1.9em;}
 .boot-cursor{display:inline-block;width:9px;height:14px;background:var(--crt-fg);vertical-align:-2px;
   animation:blink 1s steps(1) infinite;}
 @keyframes blink{50%{opacity:0;}}
+@media (max-width:480px){
+  #boot-layer{font-size:11px;padding:8vh 6vw;}
+}
 
 /* ---------- header ---------- */
 .site-header{
@@ -59,10 +62,13 @@ a{color:var(--royal);text-decoration-color:var(--royal);text-underline-offset:3p
   background:
     radial-gradient(circle at 1px 1px, rgba(46,139,121,0.16) 1px, transparent 0) 0 0/22px 22px;
 }
+.hero-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:40px;align-items:center;}
 .hero h1{font-family:var(--pixel);font-weight:700;font-size:clamp(22px,4vw,32px);line-height:1.6;margin:0 0 22px;}
 .hero h1 em{font-style:normal;color:var(--teal);}
 .hero p{font-family:var(--serif);font-size:17px;color:#3a4441;line-height:1.7;max-width:52ch;margin:0 0 28px;}
 .hero-cta{display:flex;gap:12px;flex-wrap:wrap;}
+.hero-cover{border:3px solid var(--ink);border-radius:6px;overflow:hidden;line-height:0;}
+.hero-cover img{width:100%;height:auto;display:block;}
 .btn{
   font-family:var(--pixel);font-size:11px;padding:14px 20px;border-radius:3px;border:2px solid var(--ink);
   text-decoration:none;color:var(--ink);display:inline-block;
@@ -111,4 +117,6 @@ a{color:var(--royal);text-decoration-color:var(--royal);text-underline-offset:3p
 
 @media (max-width:640px){
   .site-header, .hero, .page-hero, .content{padding-left:20px;padding-right:20px;}
+  .hero-grid{grid-template-columns:1fr;}
+  .hero-cover{order:-1;}
 }
