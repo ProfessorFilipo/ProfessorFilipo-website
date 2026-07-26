@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pesquisa — Filipo Novo Mór</title>
+<meta name="description" content="Pesquisa em IA Generativa, Digital Twins e Sistemas Autônomos — do Mission-DT, para frotas híbridas de veículos não tripulados, às origens em computação de alto desempenho.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <nav class="main-nav" aria-label="Navegação principal">
+      <a href="sobre.html">SOBRE</a>
+      <a href="pesquisa.html">PESQUISA</a>
+      <a href="ensino.html">ENSINO</a>
+      <a href="ferramentas.html">FERRAMENTAS</a>
+      <a href="blog.html">BLOG</a>
+      <a href="contato.html">CONTATO</a>
+    </nav>
+    <a href="index.html" class="site-logo" aria-label="Filipo Novo Mór — página inicial">
+      <img src="assets/logo.png" alt="Logo pessoal — perfil de robô estilizado dentro de um círculo teal">
+    </a>
+  </header>
+
+  <div class="page-hero">
+    <p class="eyebrow">PESQUISA</p>
+    <h1>Digital Twins para<br>frotas autônomas híbridas</h1>
+    <p>IA Generativa, Digital Twins e Sistemas Autônomos — pesquisa que conecta simulação, dados em tempo real e sistemas de IA aplicados ao mundo físico.</p>
+  </div>
+
+  <main class="content">
+
+    <h2>PROJETO ATUAL — MISSION-DT</h2>
+    <div class="research-card">
+      <h3>Digital Twin em nível de missão para frotas híbridas</h3>
+      <p class="subtitle">Arquitetura open-source para frotas heterogêneas de veículos aéreos e aquáticos não tripulados</p>
+      <p>O Mission-DT propõe uma virada de perspectiva: em vez de criar um "gêmeo digital" pra cada veículo isolado, a própria <strong>missão</strong> vira a entidade gêmea, orquestrando uma frota de agentes que podem ser veículos físicos de verdade ou emuladores virtuais — de forma intercambiável e transparente do ponto de vista do sistema.</p>
+      <p>Isso viabiliza operação em realidade mista (parte da frota é física, parte é simulada), testes de "e se" seguros antes de uma missão real, e implantação incremental de frotas — tudo rodando em hardware modesto, sem depender de simuladores robóticos pesados. Pensado especificamente para equipes com poucos recursos: monitoramento de qualidade de água costeira, buscas e resgate, inspeção de infraestrutura remota.</p>
+
+      <div class="stat-row">
+        <span class="stat-chip">ATÉ 100 AGENTES HÍBRIDOS</span>
+        <span class="stat-chip">LATÊNCIA MEDIANA ~118MS</span>
+        <span class="stat-chip">FIDELIDADE &lt;1M MESMO COM 10% DE PERDA</span>
+      </div>
+
+      <p>Implementação leve em Python, com visualização 3D desacoplada do núcleo de tempo real — e totalmente open-source.</p>
+      <p class="authors">Com Cassio J. Dhein Silva, Anderson R. P. Domingues e Cesar A. M. Marcon (PUCRS), e Thais Webber (Aston University, Reino Unido). Financiado em parte pelo CNPq e PUCRS/PROPESQ.</p>
+
+      <div class="link-row">
+        <a class="btn ghost" href="https://github.com/ProfessorFilipo/mission-dt" target="_blank" rel="noopener">CÓDIGO NO GITHUB ↗</a>
+      </div>
+    </div>
+
+    <h2>LINHA DE PESQUISA</h2>
+    <p>Meu doutorado na PUCRS investiga IA Generativa, Digital Twins e Sistemas Autônomos — com o Mission-DT como principal estudo de caso: como sistemas de IA e representações digitais sincronizadas podem coordenar frotas de robôs físicos e virtuais operando juntos, em tempo real, mesmo com recursos computacionais e de rede limitados.</p>
+
+    <h2>ORIGENS</h2>
+    <p>Minha trajetória de pesquisa começou no mestrado, com foco em Computação de Alto Desempenho (HPC) — modelos de alto nível para prever o desempenho de aplicações legadas ao migrá-las para GPU, usando CUDA e OpenCL. Desse período nasceu o <strong>Sagan Simulator</strong>, um simulador gravitacional em C e CUDA (nome em tributo a Carl Sagan), desenvolvido com o apoio do CESUP/UFRGS e do Laboratório de Alto Desempenho da PUCRS.</p>
+
+    <p class="quote-block">"Somewhere, something incredible is waiting to be known." — Carl Sagan</p>
+
+  </main>
+
+  <footer class="api-status">
+    <span id="api-status-text">Verificando conexão com a API…</span>
+  </footer>
+
+  <script src="js/api.js"></script>
+</body>
+</html>

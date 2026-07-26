@@ -115,6 +115,25 @@ a{color:var(--royal);text-decoration-color:var(--royal);text-underline-offset:3p
 .exp-item ul{margin:0;padding-left:20px;}
 .exp-item li{font-family:var(--serif);font-size:15.5px;line-height:1.65;color:#232b28;margin-bottom:6px;}
 
+/* ---------- featured research project ---------- */
+.research-card{
+  border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:6px;
+  padding:28px 28px 24px;background:#fff;margin-bottom:16px;
+}
+.research-card h3{font-family:var(--pixel);font-weight:700;font-size:16px;margin:0 0 6px;}
+.research-card .subtitle{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--stone);margin:0 0 18px;}
+.stat-row{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0;}
+.stat-chip{
+  font-family:var(--pixel);font-size:9px;padding:8px 12px;border:1px solid var(--teal);
+  border-radius:3px;color:var(--teal-deep);background:var(--paper);
+}
+.research-card .authors{font-family:var(--serif);font-size:13.5px;color:var(--stone);margin:16px 0 0;}
+
+.quote-block{
+  font-family:var(--serif);font-style:italic;font-size:16px;color:var(--teal-deep);
+  border-left:3px solid var(--teal);padding-left:18px;margin:32px 0;
+}
+
 @media (max-width:640px){
   .site-header, .hero, .page-hero, .content{padding-left:20px;padding-right:20px;}
   .hero-grid{grid-template-columns:1fr;}
