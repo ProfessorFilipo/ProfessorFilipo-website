@@ -21,6 +21,19 @@ and Digital Twins, teaching at PUCRS and Unilasalle.
 frontend/ site estático (Cloudflare Pages)<br>
 backend/ API FastAPI (GCP Cloud Run)<br>
 database/ schema.sql (Postgres/Neon)<br>
+scripts/ developer tooling (e.g. applying a batch of file updates)<br>
+docs/ full project documentation (see below)
+
+## Documentation
+
+Full setup, deployment, and integration documentation lives in
+[`docs/`](./docs/README.md), including:
+
+- An inventory of every external service this project depends on
+- Local environment setup, from scratch
+- The exact step-by-step deployment process
+- A safe onboarding exercise for a new developer's first deployment
+- How local tooling connects to Cloudflare R2, Resend, and Neon
 
 ## Local setup
 
@@ -30,6 +43,9 @@ database/ schema.sql (Postgres/Neon)<br>
    console's SQL Editor, or any Postgres client).
 3. Install the backend dependencies and run it locally before deploying.
 
+See [`docs/02-getting-started.md`](./docs/02-getting-started.md) for the
+full, detailed version of this process.
+
 ## Deployment
 
 - **Frontend**: push to the repository -> Cloudflare Pages builds and
@@ -38,8 +54,17 @@ database/ schema.sql (Postgres/Neon)<br>
   Cloud Code plugin — with `--max-instances` set as a safeguard against
   unexpected cost.
 
+See [`docs/03-deployment-guide.md`](./docs/03-deployment-guide.md) for the
+full, detailed version of this process.
+
 ## Security
 
 - `.env` is never committed (already protected by `.gitignore`).
 - Cloud Run is configured with a maximum instance limit.
 - Cloudflare Turnstile + rate limiting sit in front of the backend.
+
+## License
+
+Code is licensed under [MIT](./LICENSE). Personal content and media (bio,
+photos, course materials) are licensed under
+[CC BY-NC-ND 4.0](./LICENSE-CONTENT.md).
