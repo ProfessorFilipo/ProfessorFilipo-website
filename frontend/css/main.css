@@ -54,7 +54,7 @@ a{color:var(--royal);text-decoration-color:var(--royal);text-underline-offset:3p
   background:var(--paper);color:var(--ink);text-decoration:none;
 }
 .main-nav a:hover{background:var(--paper-2);}
-.site-logo img{width:56px;height:auto;display:block;}
+.site-logo img{width:64px;height:auto;display:block;}
 
 /* ---------- language switcher ---------- */
 .lang-switch{font-family:var(--pixel);font-size:9px;display:flex;gap:6px;align-items:center;}
@@ -71,7 +71,7 @@ a{color:var(--royal);text-decoration-color:var(--royal);text-underline-offset:3p
 .breadcrumb .sep{margin:0 6px;}
 
 /* ---------- card icons ---------- */
-.card-icon{width:32px;height:32px;margin-bottom:12px;display:block;image-rendering:pixelated;}
+.card-icon{width:44px;height:44px;margin-bottom:12px;display:block;image-rendering:pixelated;}
 
 /* ---------- hero ---------- */
 .hero{
