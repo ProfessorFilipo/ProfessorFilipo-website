@@ -42,6 +42,14 @@ class Settings(BaseSettings):
     # CORS — comma-separated list of allowed frontend origins
     cors_allowed_origins: str = "http://localhost:3000"
 
+    # Cloudflare Turnstile (contact form captcha)
+    turnstile_secret_key: str = ""
+
+    # Resend (transactional email for the contact form)
+    resend_api_key: str = ""
+    contact_email_to: str = ""
+    contact_email_from: str = ""
+
     @property
     def locales_list(self) -> list[str]:
         return [loc.strip() for loc in self.available_locales.split(",")]

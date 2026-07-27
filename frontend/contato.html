@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contato — Filipo Novo Mór</title>
+<meta name="description" content="Entre em contato — formulário direto, sem precisar abrir seu cliente de e-mail.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/main.css?v=4">
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <nav class="main-nav" aria-label="Navegação principal">
+      <a href="sobre.html">SOBRE</a>
+      <a href="pesquisa.html">PESQUISA</a>
+      <a href="ensino.html">ENSINO</a>
+      <a href="ferramentas.html">FERRAMENTAS</a>
+      <a href="blog.html">BLOG</a>
+      <a href="contato.html">CONTATO</a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <div class="lang-switch">
+        <span class="current">PT-BR</span>
+        <span class="sep">/</span>
+        <a href="#" title="Versão em inglês em breve">EN-CA</a>
+      </div>
+      <a href="index.html" class="site-logo" aria-label="Filipo Novo Mór — página inicial">
+        <img src="assets/logo-photo.jpg" alt="Foto de Filipo com seu gato, o Alemão">
+      </a>
+    </div>
+  </header>
+
+  <div class="page-hero">
+    <p class="breadcrumb"><a href="index.html">INÍCIO</a><span class="sep">/</span>CONTATO</p>
+    <h1>Fale comigo</h1>
+    <p>Preencha o formulário abaixo — a mensagem chega direto na minha caixa de entrada.</p>
+  </div>
+
+  <main class="content">
+
+    <form class="contact-form" id="contact-form">
+      <div class="form-field">
+        <label for="name">NOME</label>
+        <input type="text" id="name" name="name" required maxlength="200">
+      </div>
+      <div class="form-field">
+        <label for="email">E-MAIL</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      <div class="form-field">
+        <label for="message">MENSAGEM</label>
+        <textarea id="message" name="message" required maxlength="5000"></textarea>
+      </div>
+
+      <!-- SUBSTITUA "SEU_SITE_KEY_AQUI" pela Site Key real do Turnstile -->
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAD-q8VKxCHMmIDHR"></div>
+
+      <div class="link-row" style="margin-top:20px;">
+        <button type="submit" class="btn primary" id="submit-btn">ENVIAR MENSAGEM</button>
+      </div>
+
+      <div class="form-status" id="form-status"></div>
+    </form>
+
+    <div class="contact-direct">
+      <p>Prefere outro caminho? <a href="https://www.linkedin.com/in/filipo/" target="_blank" rel="noopener">LinkedIn ↗</a></p>
+    </div>
+
+  </main>
+
+  <footer class="api-status">
+    <span id="api-status-text">Verificando conexão com a API…</span>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/contact-form.js"></script>
+</body>
+</html>

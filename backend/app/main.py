@@ -13,7 +13,7 @@ from slowapi import _rate_limit_exceeded_handler
 
 from app.core.config import settings
 from app.core.limiter import limiter
-from app.routers import health, pages, counter
+from app.routers import health, pages, counter, contact
 
 app = FastAPI(
     title="filipomor.com API",
@@ -37,6 +37,7 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(pages.router)
 app.include_router(counter.router)
+app.include_router(contact.router)
 
 
 @app.get("/")

@@ -83,6 +83,22 @@ a{color:var(--royal);text-decoration-color:var(--royal);text-underline-offset:3p
 }
 .replay-boot-btn:hover{opacity:1;border-color:var(--teal);color:var(--teal-deep);}
 
+/* ---------- contact form ---------- */
+.contact-form{max-width:520px;}
+.form-field{margin-bottom:20px;}
+.form-field label{display:block;font-family:var(--pixel);font-size:10px;color:var(--stone);margin-bottom:8px;}
+.form-field input, .form-field textarea{
+  width:100%;font-family:var(--serif);font-size:15px;padding:12px 14px;
+  border:1.5px solid var(--ink);border-radius:3px;background:#fff;color:var(--ink);
+  box-sizing:border-box;
+}
+.form-field textarea{min-height:140px;resize:vertical;}
+.form-field input:focus, .form-field textarea:focus{outline:2px solid var(--teal);outline-offset:1px;}
+.form-status{font-family:var(--serif);font-size:14px;margin-top:16px;padding:12px 14px;border-radius:4px;display:none;}
+.form-status.success{display:block;background:#e6f3ee;color:var(--teal-deep);border:1px solid var(--teal);}
+.form-status.error{display:block;background:#fbe9e7;color:#a33;border:1px solid #a33;}
+.contact-direct{margin:32px 0 0;padding-top:24px;border-top:1px solid var(--line);}
+
 /* ---------- hero ---------- */
 .hero{
   padding:60px 40px 80px;
