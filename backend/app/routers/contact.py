@@ -2,9 +2,17 @@
 Contact form endpoint. Verifies a Cloudflare Turnstile token server-side
 (client-side verification alone can be bypassed by any script), then sends
 an email via Resend.
+
+Every failure path prints full detail to stderr with flush=True — this is
+deliberately simple/blunt rather than routed through the `logging` module,
+so it is guaranteed to show up in Cloud Run logs regardless of any logger
+configuration quirk.
 """
+import sys
+import traceback
+
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, EmailStr, Field
 
 from app.core.config import settings
@@ -23,35 +31,52 @@ class ContactMessage(BaseModel):
     turnstile_token: str
 
 
+def log_error(label: str, detail: str) -> None:
+    print(f"CONTACT FORM ERROR [{label}]: {detail}", file=sys.stderr, flush=True)
+
+
 async def verify_turnstile(token: str, remote_ip: str) -> bool:
-    async with httpx.AsyncClient(timeout=10) as client:
-        response = await client.post(
-            TURNSTILE_VERIFY_URL,
-            data={
-                "secret": settings.turnstile_secret_key,
-                "response": token,
-                "remoteip": remote_ip,
-            },
-        )
-        result = response.json()
-        return result.get("success", False)
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            response = await client.post(
+                TURNSTILE_VERIFY_URL,
+                data={
+                    "secret": settings.turnstile_secret_key,
+                    "response": token,
+                    "remoteip": remote_ip,
+                },
+            )
+            result = response.json()
+            if not result.get("success", False):
+                log_error("turnstile", f"verification failed, response body={result}")
+            return result.get("success", False)
+    except Exception:
+        log_error("turnstile", traceback.format_exc())
+        raise HTTPException(status_code=502, detail="Falha ao verificar o captcha (Turnstile).")
 
 
 async def send_contact_email(payload: ContactMessage) -> None:
-    async with httpx.AsyncClient(timeout=10) as client:
-        response = await client.post(
-            RESEND_API_URL,
-            headers={"Authorization": f"Bearer {settings.resend_api_key}"},
-            json={
-                "from": settings.contact_email_from,
-                "to": [settings.contact_email_to],
-                "reply_to": payload.email,
-                "subject": f"[filipomor.com] Nova mensagem de {payload.name}",
-                "text": f"De: {payload.name} <{payload.email}>\n\n{payload.message}",
-            },
-        )
-        if response.status_code >= 400:
-            raise HTTPException(status_code=502, detail="Falha ao enviar o e-mail.")
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            response = await client.post(
+                RESEND_API_URL,
+                headers={"Authorization": f"Bearer {settings.resend_api_key}"},
+                json={
+                    "from": settings.contact_email_from,
+                    "to": [settings.contact_email_to],
+                    "reply_to": payload.email,
+                    "subject": f"[filipomor.com] Nova mensagem de {payload.name}",
+                    "text": f"De: {payload.name} <{payload.email}>\n\n{payload.message}",
+                },
+            )
+            if response.status_code >= 400:
+                log_error("resend", f"status={response.status_code} body={response.text}")
+                raise HTTPException(status_code=502, detail="Falha ao enviar o e-mail (Resend).")
+    except HTTPException:
+        raise
+    except Exception:
+        log_error("resend", traceback.format_exc())
+        raise HTTPException(status_code=502, detail="Falha ao enviar o e-mail (Resend).")
 
 
 @router.post("/send")
