@@ -54,7 +54,7 @@ a{color:var(--royal);text-decoration-color:var(--royal);text-underline-offset:3p
   background:var(--paper);color:var(--ink);text-decoration:none;
 }
 .main-nav a:hover{background:var(--paper-2);}
-.site-logo img{width:64px;height:auto;display:block;}
+.site-logo img{width:80px;height:auto;display:block;}
 
 /* ---------- language switcher ---------- */
 .lang-switch{font-family:var(--pixel);font-size:9px;display:flex;gap:6px;align-items:center;}
@@ -72,6 +72,16 @@ a{color:var(--royal);text-decoration-color:var(--royal);text-underline-offset:3p
 
 /* ---------- card icons ---------- */
 .card-icon{width:44px;height:44px;margin-bottom:12px;display:block;image-rendering:pixelated;}
+
+/* ---------- replay boot animation button (Home only, discreet) ---------- */
+.replay-boot-btn{
+  position:fixed;bottom:16px;right:16px;z-index:50;
+  width:30px;height:30px;border-radius:50%;border:1px solid var(--line);
+  background:var(--paper);color:var(--stone);font-size:15px;font-family:var(--pixel);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  opacity:0.45;transition:opacity .2s,border-color .2s,color .2s;
+}
+.replay-boot-btn:hover{opacity:1;border-color:var(--teal);color:var(--teal-deep);}
 
 /* ---------- hero ---------- */
 .hero{
