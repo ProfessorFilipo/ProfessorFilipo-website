@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Em Construção — filipomor.com</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Paleta oficial — manual de identidade visual */
+    --paper: #F1F4EF;
+    --paper-2: #E7ECE3;
+    --ink: #10181C;
+    --teal: #2E8B79;
+    --teal-deep: #1C5C4F;
+    --amber: #E8871E;
+    --royal: #3B4FE0;
+    --stone: #8A8677;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Serif 4', serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 3rem 1.25rem 2rem;
+  }
+
+  .badge-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+
+  .badge {
+    font-family: 'Silkscreen', monospace;
+    font-size: 10px;
+    letter-spacing: 0.02em;
+    background: var(--paper-2);
+    color: var(--stone);
+    border: 1px solid var(--stone);
+    padding: 5px 9px;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    font-family: 'Silkscreen', monospace;
+    font-size: clamp(24px, 6vw, 40px);
+    line-height: 1.4;
+    margin: 0 0 1.5rem;
+    color: var(--ink);
+    text-transform: uppercase;
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 0.55em;
+    height: 1em;
+    background: var(--teal-deep);
+    margin-left: 4px;
+    vertical-align: -0.12em;
+    animation: blink 1s steps(1) infinite;
+  }
+
+  @keyframes blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+
+  .stripes {
+    width: min(520px, 100%);
+    height: 22px;
+    margin-bottom: 1.75rem;
+    background-image: repeating-linear-gradient(
+      45deg,
+      var(--teal) 0 18px,
+      var(--ink) 18px 36px
+    );
+    background-size: 200% 100%;
+    animation: crawl 6s linear infinite;
+    border: 2px solid var(--ink);
+  }
+
+  @keyframes crawl {
+    from { background-position: 0 0; }
+    to { background-position: -72px 0; }
+  }
+
+  .lamp-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.75rem;
+    font-family: 'Silkscreen', monospace;
+    font-size: 11px;
+    color: var(--stone);
+    text-transform: uppercase;
+  }
+
+  .lamp {
+    width: 14px;
+    height: 14px;
+    background: var(--teal);
+    border: 2px solid var(--teal-deep);
+    animation: pulse 1.2s steps(2) infinite;
+  }
+
+  @keyframes pulse {
+    0%, 49% { background: var(--teal); }
+    50%, 100% { background: var(--teal-deep); }
+  }
+
+  p.lede {
+    max-width: 480px;
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--ink);
+    margin: 0 0 0.75rem;
+  }
+
+  p.sub {
+    max-width: 440px;
+    font-size: 14px;
+    color: var(--stone);
+    margin: 0 0 2rem;
+  }
+
+  .marquee {
+    width: 100%;
+    max-width: 620px;
+    overflow: hidden;
+    background: var(--ink);
+    border: 2px solid var(--ink);
+    padding: 8px 0;
+    margin-bottom: 2.25rem;
+  }
+
+  .marquee span {
+    display: inline-block;
+    white-space: nowrap;
+    font-family: 'Silkscreen', monospace;
+    font-size: 12px;
+    color: var(--paper);
+    letter-spacing: 0.04em;
+    padding-left: 100%;
+    animation: scroll 16s linear infinite;
+  }
+
+  @keyframes scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+  }
+
+  .btn {
+    font-family: 'Silkscreen', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink);
+    background: var(--amber);
+    border: 2px solid var(--ink);
+    padding: 12px 22px;
+    box-shadow: 4px 4px 0 var(--teal-deep);
+  }
+
+  .btn:active {
+    box-shadow: 1px 1px 0 var(--teal-deep);
+    transform: translate(3px, 3px);
+  }
+
+  footer {
+    margin-top: 3rem;
+    font-family: 'Silkscreen', monospace;
+    font-size: 10px;
+    color: var(--stone);
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+  <div class="badge-row">
+    <span class="badge">Em obras desde 2026</span>
+    <span class="badge">Webmaster: FM</span>
+    <span class="badge">Status: ativo</span>
+  </div>
+
+  <h1>Em construção<span class="cursor"></span></h1>
+
+  <div class="stripes" role="img" aria-label="Faixa de sinalização listrada"></div>
+
+  <div class="lamp-row">
+    <span class="lamp" aria-hidden="true"></span>
+    Obras em andamento
+  </div>
+
+  <p class="lede">Esta seção do site ainda está sendo construída — literalmente.</p>
+  <p class="sub">Volte em breve para conferir o resultado. Enquanto isso, o resto do site já está de pé.</p>
+
+  <div class="marquee">
+    <span>★ ESTA PÁGINA ESTÁ SENDO CONSTRUÍDA ★ VOLTE EM BREVE ★ OBRIGADO PELA PACIÊNCIA ★ ESTA PÁGINA ESTÁ SENDO CONSTRUÍDA ★ VOLTE EM BREVE ★ OBRIGADO PELA PACIÊNCIA ★</span>
+  </div>
+
+  <a class="btn" href="/">← Voltar para a home</a>
+
+  <footer>Melhor visualizado com paciência e um pouco de nostalgia</footer>
+
+</body>
+</html>
