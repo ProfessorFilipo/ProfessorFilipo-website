@@ -9,11 +9,11 @@ against the real database.
 | Tool | Version | Purpose |
 |---|---|---|
 | [PyCharm](https://www.jetbrains.com/pycharm/) | Community or Professional | Primary IDE for this project. A JetBrains educational (teacher) license works fine. |
-| [Python](https://www.python.org/downloads/) | 3.13.x | Backend runtime. Match the version used in `backend/Dockerfile` so local behaviour matches production. |
-| [Git](https://git-scm.com/downloads) | Any recent version | Source control. |
-| [Google Cloud CLI (`gcloud`)](https://cloud.google.com/sdk/docs/install) | Any recent version | Used to deploy the backend to Cloud Run. |
+| [Python](https://www.python.org/downloads/) | 3.13.x | Backend runtime. Match the version used in `backend/Dockerfile` so local behaviour matches production. On macOS, install via [Homebrew](https://brew.sh) (`brew install python@3.13`) if you don't already have 3.13. |
+| [Git](https://git-scm.com/downloads) | Any recent version | Source control. On macOS, this is usually already present via Xcode Command Line Tools — check with `git --version`. |
+| [Google Cloud CLI (`gcloud`)](https://cloud.google.com/sdk/docs/install) | Any recent version | Used to deploy the backend to Cloud Run. On macOS: `brew install --cask google-cloud-sdk`. |
 | [Docker Desktop](https://www.docker.com/products/docker-desktop/) | Any recent version | Optional but recommended: lets you build and run the exact container that gets deployed, locally, before pushing. |
-| A ZIP-capable file tool | — | Windows' built-in `Expand-Archive` (PowerShell) is sufficient; 7-Zip works too if you prefer it. |
+| A ZIP-capable file tool | — | Windows: the built-in `Expand-Archive` (PowerShell) is sufficient, or 7-Zip if you prefer it. macOS: the built-in `unzip` command works fine. |
 
 Node.js is **not required** for day-to-day work: the frontend is plain
 HTML/CSS/JS with no build step. It would only be needed if you wanted to
@@ -22,10 +22,25 @@ Git-based auto-deploy (see the [Deployment Guide](./03-deployment-guide.md)).
 
 ## Getting the code
 
+**Windows (PowerShell):**
 ```powershell
 git clone https://github.com/ProfessorFilipo/ProfessorFilipo-website.git
 cd ProfessorFilipo-website
 ```
+
+**macOS (Terminal):**
+```bash
+git clone https://github.com/ProfessorFilipo/ProfessorFilipo-website.git
+cd ProfessorFilipo-website
+```
+
+(Identical commands — the only difference going forward is the shell syntax for
+activating the virtual environment and a couple of file commands, called out
+below.)
+
+Alternatively, on either platform, use PyCharm's own **File → New → Project
+from Version Control**, pasting the repository URL — this clones the repo
+and opens it as a project in one step.
 
 Open the folder in PyCharm as a project.
 
@@ -35,21 +50,33 @@ Open the folder in PyCharm as a project.
 
 From the `backend/` folder:
 
+**Windows (PowerShell):**
 ```powershell
 cd backend
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 ```
 
+**macOS (Terminal):**
+```bash
+cd backend
+python3.13 -m venv .venv
+source .venv/bin/activate
+```
+
 PyCharm can also create and manage this for you: **Settings → Project →
 Python Interpreter → Add Interpreter → Virtualenv Environment**, pointing
-at the `backend/` folder and Python 3.13.
+at the `backend/` folder and Python 3.13. On macOS, if PyCharm defaults to
+an unrelated older interpreter (e.g. a system Python 3.9 from another
+project), switch it explicitly to the `backend/.venv` you just created:
+**Add Interpreter → Add Local Interpreter → Existing**, pointing at
+`backend/.venv/bin/python3.13`.
 
 ### Install dependencies
 
-With the virtual environment active:
+With the virtual environment active (same command on both platforms):
 
-```powershell
+```
 pip install -r requirements.txt
 ```
 
@@ -60,17 +87,28 @@ member for the development database connection string and any API keys
 you don't already have — see
 [Environment Overview](./01-environment-overview.md)):
 
+**Windows (PowerShell):**
 ```powershell
 copy .env.example .env
 ```
 
+**macOS (Terminal):**
+```bash
+cp .env.example .env
+```
+
 Edit `.env` with a text editor and fill in `DATABASE_URL` at minimum. The
 other variables (R2, Turnstile, Resend) have safe empty defaults and are
-only needed if you're working on the features that use them.
+only needed if you're working on the features that use them. The database
+connection string itself doesn't live in this repository (by design — see
+[Environment Overview](./01-environment-overview.md)); get it from the
+Neon project dashboard directly, on whichever machine you're setting up.
 
 ### Run the backend locally
 
-```powershell
+Same command on both platforms:
+
+```
 uvicorn app.main:app --reload --port 8080
 ```
 

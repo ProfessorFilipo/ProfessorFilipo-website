@@ -120,24 +120,35 @@ example) is to `print(..., file=sys.stderr, flush=True)` on any caught
 exception, specifically so it reliably shows up here regardless of how
 Python's `logging` module happens to be configured.
 
-## Applying a bundle of file changes with `apply-update.ps1`
+## Applying a bundle of file changes with `apply-update`
 
 When receiving a set of files to update all at once, a helper script is
-available to avoid manually copying files into place one by one:
+available to avoid manually copying files into place one by one. Two
+equivalent versions exist in `scripts/`: `apply-update.ps1` for Windows
+(PowerShell) and `apply-update.sh` for macOS/Linux (bash) — same behaviour,
+platform-appropriate syntax.
 
+**Windows (PowerShell):**
 ```powershell
 .\scripts\apply-update.ps1 -ZipPath "path\to\the\update.zip"
 ```
 
-The script expects the ZIP's internal paths to already match the
-repository's real folder structure (for example,
-`frontend/css/main.css`, `backend/app/main.py`) — it extracts directly
-into the repository root, overwriting existing files, and then prints
-`git status` so you can review exactly what changed before committing.
-It does **not** commit or push on your behalf — that remains a deliberate,
-separate step:
+**macOS/Linux (bash):**
+```bash
+./scripts/apply-update.sh path/to/the/update.zip
+```
+(If this is your first time running it on a given clone, make it
+executable once: `chmod +x scripts/apply-update.sh`.)
 
-```powershell
+Both scripts expect the ZIP's internal paths to already match the
+repository's real folder structure (for example,
+`frontend/css/main.css`, `backend/app/main.py`) — they extract directly
+into the repository root, overwriting existing files, and then print
+`git status` so you can review exactly what changed before committing.
+Neither script commits or pushes on your behalf — that remains a
+deliberate, separate step:
+
+```
 git add -A
 git commit -m "Describe your change"
 git push
