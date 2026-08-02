@@ -99,6 +99,15 @@ a{color:var(--royal);text-decoration-color:var(--royal);text-underline-offset:3p
 .form-status.error{display:block;background:#fbe9e7;color:#a33;border:1px solid #a33;}
 .contact-direct{margin:32px 0 0;padding-top:24px;border-top:1px solid var(--line);}
 
+/* ---------- format badge (PRESENCIAL / EAD) ---------- */
+.format-badge{
+  font-family:var(--pixel);font-size:8.5px;padding:4px 8px;border-radius:3px;
+  display:inline-block;margin-left:10px;vertical-align:middle;
+}
+.format-badge.presencial{background:var(--paper-2);color:var(--stone);border:1px solid var(--line);}
+.format-badge.ead{background:var(--teal);color:#fff;}
+.official-link-row{margin:16px 0 0;}
+
 /* ---------- hero ---------- */
 .hero{
   padding:60px 40px 80px;

@@ -7,12 +7,11 @@
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
-<title>Contato — Filipo Novo Mór</title>
-<meta name="description" content="Entre em contato — formulário direto, sem precisar abrir seu cliente de e-mail.">
+<title>Sistemas Operacionais — Filipo Novo Mór</title>
+<meta name="description" content="Materiais de Sistemas Operacionais — PUCRS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/main.css?v=5">
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
 
@@ -38,39 +37,32 @@
   </header>
 
   <div class="page-hero">
-    <p class="breadcrumb"><a href="index.html">INÍCIO</a><span class="sep">/</span>CONTATO</p>
-    <h1>Fale comigo</h1>
-    <p>Preencha o formulário abaixo — a mensagem chega direto na minha caixa de entrada.</p>
+    <p class="breadcrumb"><a href="index.html">INÍCIO</a><span class="sep">/</span><a href="ensino.html">ENSINO</a><span class="sep">/</span><a href="ensino-disciplinas.html">DISCIPLINAS</a><span class="sep">/</span>SISTEMAS OPERACIONAIS</p>
+    <p class="eyebrow">PUCRS</p>
+    <h1>Sistemas Operacionais</h1>
+    <p>Fundamentos de sistemas operacionais: gerência de memória e algoritmos de substituição de página (LRU, ótimo).</p>
   </div>
 
   <main class="content">
 
-    <form class="contact-form" id="contact-form">
-      <div class="form-field">
-        <label for="name">NOME</label>
-        <input type="text" id="name" name="name" required maxlength="200">
-      </div>
-      <div class="form-field">
-        <label for="email">E-MAIL</label>
-        <input type="email" id="email" name="email" required>
-      </div>
-      <div class="form-field">
-        <label for="message">MENSAGEM</label>
-        <textarea id="message" name="message" required maxlength="5000"></textarea>
-      </div>
+    <div class="official-link-row">
+      <a class="btn primary" href="https://moodle.pucrs.br/course/view.php?id=95197" target="_blank" rel="noopener">ACESSO OFICIAL — MOODLE ↗</a>
+    </div>
 
-      <!-- SUBSTITUA "SEU_SITE_KEY_AQUI" pela Site Key real do Turnstile -->
-      <div class="cf-turnstile" data-sitekey="SEU_SITE_KEY_AQUI"></div>
+    <!--
+      MODELO DE CONTEUDO: para adicionar um novo semestre, adicione um botao
+      <button class="semester-tab"> com data-target unico, e um
+      <div class="semester-panel"> correspondente com o mesmo id.
+      Troque os links de arquivo de exemplo (#) pelos arquivos reais.
+    -->
+    <div class="semester-tabs">
+      <button class="semester-tab active" data-target="sem-2026-2">2026/II</button>
+    </div>
 
-      <div class="link-row" style="margin-top:20px;">
-        <button type="submit" class="btn primary" id="submit-btn">ENVIAR MENSAGEM</button>
-      </div>
-
-      <div class="form-status" id="form-status"></div>
-    </form>
-
-    <div class="contact-direct">
-      <p>Prefere outro caminho? <a href="https://www.linkedin.com/in/filipo/" target="_blank" rel="noopener">LinkedIn ↗</a></p>
+    <div class="semester-panel active" id="sem-2026-2">
+      <ul class="material-list">
+        <li>Materiais serão adicionados ao longo do semestre <a class="file-link" href="#">—</a></li>
+      </ul>
     </div>
 
   </main>
@@ -80,6 +72,6 @@
   </footer>
 
   <script src="js/api.js"></script>
-  <script src="js/contact-form.js"></script>
+  <script src="js/semester-tabs.js"></script>
 </body>
 </html>
