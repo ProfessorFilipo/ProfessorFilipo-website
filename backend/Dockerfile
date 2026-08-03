@@ -3,6 +3,19 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
+# System libraries required by WeasyPrint (PDF rendering for the
+# autoavaliação report) — Pango/HarfBuzz for text shaping, cairo for
+# drawing, gdk-pixbuf for the embedded evidence images, fontconfig so the
+# @font-face fonts bundled in app/assets/fonts resolve correctly.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libgdk-pixbuf-2.0-0 \
+    libcairo2 \
+    libharfbuzz0b \
+    fontconfig \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install dependencies first (better layer caching — only reinstalls when
 # requirements.txt actually changes, not on every code edit)
 COPY requirements.txt .

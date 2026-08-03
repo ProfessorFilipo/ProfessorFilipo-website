@@ -8,3 +8,9 @@ python-multipart>=0.0.9
 slowapi>=0.1.9,<0.2
 httpx>=0.27,<0.28
 email-validator>=2.2,<3.0
+
+# Geração do relatório de autoavaliação (PDF)
+weasyprint>=69,<70
+pikepdf>=9,<10
+pypdf>=5,<6
+Pillow>=11,<12

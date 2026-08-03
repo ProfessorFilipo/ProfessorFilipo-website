@@ -7,8 +7,8 @@
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
-<title>Práticas em Engenharia de Software — Filipo Novo Mór</title>
-<meta name="description" content="Materiais de Práticas em Engenharia de Software — PUCRS.">
+<title>Autoavaliação de Participação — Filipo Novo Mór</title>
+<meta name="description" content="Gerador do relatório de autoavaliação de participação individual, em PDF, para entrega no Moodle.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/main.css?v=6">
@@ -37,33 +37,30 @@
   </header>
 
   <div class="page-hero">
-    <p class="breadcrumb"><a href="index.html">INÍCIO</a><span class="sep">/</span><a href="ensino.html">ENSINO</a><span class="sep">/</span><a href="ensino-disciplinas.html">DISCIPLINAS</a><span class="sep">/</span>PRÁTICAS EM ENGENHARIA DE SOFTWARE</p>
-    <p class="eyebrow">PUCRS</p>
-    <h1>Práticas em Engenharia de Software</h1>
-    <p>Aplicação prática de metodologias e ferramentas de engenharia de software em projetos reais.</p>
+    <p class="breadcrumb"><a href="index.html">INÍCIO</a><span class="sep">/</span><a href="ferramentas.html">FERRAMENTAS</a><span class="sep">/</span>AUTOAVALIAÇÃO DE PARTICIPAÇÃO</p>
+    <p class="eyebrow">FERRAMENTA PARA ALUNOS</p>
+    <h1>Autoavaliação de participação</h1>
+    <p>Preencha a autoavaliação do sprint e gere o relatório em PDF para anexar na tarefa correspondente no Moodle.</p>
   </div>
 
   <main class="content">
 
-    <div class="official-link-row">
-      <a class="btn primary" href="https://moodle.pucrs.br/course/view.php?id=95345" target="_blank" rel="noopener">ACESSO OFICIAL — MOODLE ↗</a>
-      <a class="btn ghost" href="autoavaliacao.html?turma=PES-2026-2&professor=Filipo+Novo+M%C3%B3r&disciplina=Pr%C3%A1tica+em+Engenharia+de+Software&sprint=1&total=6">AUTOAVALIAÇÃO DE PARTICIPAÇÃO →</a>
+    <div class="aa-privacy-note">
+      <i>Nenhum dado ou arquivo enviado aqui é armazenado neste site — tudo é processado apenas para gerar o
+      seu PDF e é descartado imediatamente após a geração. O download é a sua única cópia.</i>
     </div>
 
-    <!--
-      MODELO DE CONTEUDO: para adicionar um novo semestre, adicione um botao
-      <button class="semester-tab"> com data-target unico, e um
-      <div class="semester-panel"> correspondente com o mesmo id.
-      Troque os links de arquivo de exemplo (#) pelos arquivos reais.
-    -->
-    <div class="semester-tabs">
-      <button class="semester-tab active" data-target="sem-2026-2">2026/II</button>
-    </div>
+    <div id="aa-wizard">
+      <div class="aa-progress-row" id="aa-dots"></div>
+      <div class="aa-progress-track"><div class="aa-progress-fill" id="aa-bar"></div></div>
+      <p class="aa-step-label" id="aa-step-label">Etapa 1</p>
 
-    <div class="semester-panel active" id="sem-2026-2">
-      <ul class="material-list">
-        <li>Materiais serão adicionados ao longo do semestre <a class="file-link" href="#">—</a></li>
-      </ul>
+      <div class="aa-card" id="aa-step-host"></div>
+
+      <div class="aa-nav-row">
+        <button type="button" class="btn ghost" id="aa-btn-back">← VOLTAR</button>
+        <button type="button" class="btn primary" id="aa-btn-next">AVANÇAR →</button>
+      </div>
     </div>
 
   </main>
@@ -73,6 +70,6 @@
   </footer>
 
   <script src="js/api.js"></script>
-  <script src="js/semester-tabs.js"></script>
+  <script src="js/autoavaliacao.js"></script>
 </body>
 </html>
