@@ -47,36 +47,38 @@ async def gerar_relatorio(
     # Um bloco de 4 campos por critério (c1..c5) — nomes fixos porque o
     # formulário sempre tem exatamente 5 critérios, não uma lista dinâmica.
     c1_nota: int = Form(..., ge=1, le=5), c1_tipo: str = Form(...),
-    c1_legenda: str = Form("", max_length=500), c1_arquivo: UploadFile | None = None,
+    c1_justificativa: str = Form(..., min_length=1, max_length=500), c1_arquivo: UploadFile | None = None,
     c2_nota: int = Form(..., ge=1, le=5), c2_tipo: str = Form(...),
-    c2_legenda: str = Form("", max_length=500), c2_arquivo: UploadFile | None = None,
+    c2_justificativa: str = Form(..., min_length=1, max_length=500), c2_arquivo: UploadFile | None = None,
     c3_nota: int = Form(..., ge=1, le=5), c3_tipo: str = Form(...),
-    c3_legenda: str = Form("", max_length=500), c3_arquivo: UploadFile | None = None,
+    c3_justificativa: str = Form(..., min_length=1, max_length=500), c3_arquivo: UploadFile | None = None,
     c4_nota: int = Form(..., ge=1, le=5), c4_tipo: str = Form(...),
-    c4_legenda: str = Form("", max_length=500), c4_arquivo: UploadFile | None = None,
+    c4_justificativa: str = Form(..., min_length=1, max_length=500), c4_arquivo: UploadFile | None = None,
     c5_nota: int = Form(..., ge=1, le=5), c5_tipo: str = Form(...),
-    c5_legenda: str = Form("", max_length=500), c5_arquivo: UploadFile | None = None,
+    c5_justificativa: str = Form(..., min_length=1, max_length=500), c5_arquivo: UploadFile | None = None,
     # Distribuição de contribuição — só relevante quando sprint_final=True.
     # Enviada como duas listas paralelas: nomes e percentuais.
     dist_nomes: list[str] = Form(default=[]),
     dist_percentuais: list[int] = Form(default=[]),
 ):
     entradas = [
-        (c1_nota, c1_tipo, c1_legenda, c1_arquivo),
-        (c2_nota, c2_tipo, c2_legenda, c2_arquivo),
-        (c3_nota, c3_tipo, c3_legenda, c3_arquivo),
-        (c4_nota, c4_tipo, c4_legenda, c4_arquivo),
-        (c5_nota, c5_tipo, c5_legenda, c5_arquivo),
+        (c1_nota, c1_tipo, c1_justificativa, c1_arquivo),
+        (c2_nota, c2_tipo, c2_justificativa, c2_arquivo),
+        (c3_nota, c3_tipo, c3_justificativa, c3_arquivo),
+        (c4_nota, c4_tipo, c4_justificativa, c4_arquivo),
+        (c5_nota, c5_tipo, c5_justificativa, c5_arquivo),
     ]
 
     criterios = []
     tamanhos = []
     try:
-        for (chave, num, nome), (nota, tipo, legenda, arquivo) in zip(CRITERIOS_ORDEM, entradas):
+        for (chave, num, nome), (nota, tipo, justificativa, arquivo) in zip(CRITERIOS_ORDEM, entradas):
             if tipo not in ("imagem", "documento"):
                 raise HTTPException(400, f"Critério {num}: tipo de evidência inválido.")
             if arquivo is None:
                 raise HTTPException(400, f"Critério {num} ({nome}): evidência obrigatória não enviada.")
+            if not justificativa.strip():
+                raise HTTPException(400, f"Critério {num} ({nome}): justificativa não pode ficar em branco.")
 
             raw = await arquivo.read()
             if not raw:
@@ -94,7 +96,7 @@ async def gerar_relatorio(
                 "tipo": tipo,
                 "arquivo_bytes": processado,
                 "nome_arquivo": arquivo.filename or f"evidencia-criterio-{num}",
-                "legenda": legenda,
+                "justificativa": justificativa,
             })
 
         check_total_size(tamanhos)
@@ -104,7 +106,11 @@ async def gerar_relatorio(
             if len(dist_nomes) != len(dist_percentuais):
                 raise HTTPException(400, "Distribuição de contribuição: nomes e percentuais não conferem.")
             if sum(dist_percentuais) != 100:
-                raise HTTPException(400, "Distribuição de contribuição: os percentuais devem somar 100%.")
+                total = sum(dist_percentuais)
+                raise HTTPException(
+                    400,
+                    f"Distribuição de contribuição: os percentuais somam {total}%, mas precisam somar 100%.",
+                )
             distribuicao = [
                 (nome, pct, i == 0) for i, (nome, pct) in enumerate(zip(dist_nomes, dist_percentuais))
             ]

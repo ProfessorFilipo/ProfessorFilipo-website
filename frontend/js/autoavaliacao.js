@@ -71,7 +71,7 @@
     crit: {}, reflexaoBem: "", reflexaoDif: "",
     dist: {},
   };
-  CRITERIOS.forEach((c) => (state.crit[c.id] = { nota: null, tipo: "imagem", legenda: "", file: null }));
+  CRITERIOS.forEach((c) => (state.crit[c.id] = { nota: null, tipo: "imagem", justificativa: "", file: null }));
 
   function steps() {
     const s = ["id", ...CRITERIOS.map((c) => c.id), "reflexao"];
@@ -136,7 +136,7 @@
       </div>
       <div class="aa-dropzone ${d.file ? "has-file" : ""}" id="dropzone">${dz}</div>
       <input type="file" id="fileInput" accept="${d.tipo === "imagem" ? "image/jpeg,image/png,image/webp" : "application/pdf"}" style="display:none;">
-      ${field("Legenda da evidência", `<textarea id="in_legenda" rows="2" placeholder="Ex.: print do quadro de tarefas mostrando...">${d.legenda}</textarea>`)}
+      ${field("Justificativa (relacione a nota escolhida com a evidência anexada)", `<textarea id="in_justificativa" rows="3" placeholder="Ex.: escolhi a nota 4 porque concluí quase todas as tarefas do sprint dentro do prazo — o print anexado mostra o quadro com as tarefas concluídas.">${d.justificativa}</textarea>`)}
       <p class="aa-error" id="err-crit"></p>
     `;
   }
@@ -150,25 +150,42 @@
     `;
   }
 
+  function ensureDistInitialized() {
+    if (!state.distMembros) {
+      state.distMembros = [state.aluno || "Você", "", "", ""];
+    }
+    // Toda vez que a etapa é (re)aberta, sincroniza state.dist com o que
+    // realmente existe em distMembros — remove qualquer índice órfão (que
+    // não corresponde mais a nenhuma linha visível) e preenche o que
+    // estiver faltando. Isso impede que um valor antigo continue entrando
+    // silenciosamente na soma depois que a linha correspondente some da tela.
+    Object.keys(state.dist).forEach((k) => {
+      if (parseInt(k) >= state.distMembros.length) delete state.dist[k];
+    });
+    state.distMembros.forEach((_, i) => {
+      if (state.dist[i] === undefined) state.dist[i] = Math.round(100 / state.distMembros.length);
+    });
+  }
+
   function renderDist() {
-    const membros = state.distMembros || ["Você", "", "", ""];
+    ensureDistInitialized();
+    const membros = state.distMembros;
     const rows = membros
       .map((m, i) => {
         const v = state.dist[i] ?? Math.round(100 / membros.length);
-        const nameField =
-          i === 0
-            ? `<label style="width:160px;">Você</label>`
-            : `<input type="text" data-nome-idx="${i}" placeholder="Nome do(a) colega" value="${m}" style="width:160px;font-family:var(--serif);font-size:14px;padding:8px;border:1px solid var(--line);border-radius:3px;">`;
+        const nomeVal = i === 0 ? (m || state.aluno || "Você") : m;
+        const nameField = `<input type="text" data-nome-idx="${i}" placeholder="${i === 0 ? "Seu nome" : "Nome do(a) colega"}" value="${nomeVal}" style="width:160px;font-family:var(--serif);font-size:14px;padding:8px;border:1px solid var(--line);border-radius:3px;">`;
         return `<div class="aa-dist-row">${nameField}<input type="range" min="0" max="100" step="1" value="${v}" data-idx="${i}"><span class="aa-dist-val" id="distval_${i}">${v}%</span></div>`;
       })
       .join("");
+    const total = membros.reduce((sum, _, i) => sum + (state.dist[i] ?? 0), 0);
     return `
       <p class="aa-eyebrow">DISTRIBUIÇÃO DE CONTRIBUIÇÃO</p>
       <h2>Como a equipe contribuiu</h2>
-      <p class="aa-help">Se o crédito total do projeto (100%) fosse dividido de acordo com a contribuição real de cada um, como você dividiria?</p>
+      <p class="aa-help">Se o crédito total do projeto (100%) fosse dividido de acordo com a contribuição real de cada um, como você dividiria? A primeira linha é você (nome já preenchido, mas pode editar).</p>
       <div id="distRows">${rows}</div>
       <button type="button" class="btn ghost" id="btnAddMembro" style="font-size:10px;margin-top:8px;">+ ADICIONAR COLEGA</button>
-      <p style="font-family:var(--serif);font-size:14px;margin-top:16px;">Total: <strong id="distTotal">100%</strong> <span id="distWarn" style="color:#a33;"></span></p>
+      <p style="font-family:var(--serif);font-size:14px;margin-top:16px;">Total: <strong id="distTotal">${total}%</strong> <span id="distWarn" style="color:#a33;">${total === 100 ? "" : " (ajuste para somar 100%)"}</span></p>
     `;
   }
 
@@ -184,7 +201,7 @@
     CRITERIOS.forEach((c) => {
       const d = state.crit[c.id];
       const val = d.nota ? `Nota ${d.nota}/5 · evidência em ${d.tipo}${d.file ? " · " + d.file.name : " · arquivo não anexado"}` : "<em>não preenchido</em>";
-      html += row(c.nome, val, list.indexOf(c.id));
+      html += row(`${c.num} — ${c.nome}`, val, list.indexOf(c.id));
     });
     html += row("Reflexão", state.reflexaoBem || state.reflexaoDif ? "Preenchida" : "<em>não preenchido</em>", list.indexOf("reflexao"));
     if (state.sprintFinal) html += row("Distribuição de contribuição", "Preenchida", list.indexOf("dist"));
@@ -213,8 +230,8 @@
       state.sprintTotal = document.getElementById("in_sprint_total")?.value ?? state.sprintTotal;
       state.sprintFinal = document.getElementById("in_final")?.checked ?? state.sprintFinal;
     } else if (CRITERIOS.some((c) => c.id === s)) {
-      const leg = document.getElementById("in_legenda");
-      if (leg) state.crit[s].legenda = leg.value;
+      const jus = document.getElementById("in_justificativa");
+      if (jus) state.crit[s].justificativa = jus.value;
     } else if (s === "reflexao") {
       state.reflexaoBem = document.getElementById("in_bem")?.value ?? state.reflexaoBem;
       state.reflexaoDif = document.getElementById("in_dif")?.value ?? state.reflexaoDif;
@@ -241,6 +258,7 @@
       const errEl = document.getElementById("err-crit");
       if (!d.nota) { errEl.textContent = "Escolha uma nota antes de continuar."; return false; }
       if (!d.file) { errEl.textContent = "Anexe uma evidência antes de continuar."; return false; }
+      if (!d.justificativa || !d.justificativa.trim()) { errEl.textContent = "Escreva uma justificativa relacionando a nota com a evidência antes de continuar."; return false; }
       errEl.textContent = "";
       return true;
     }
@@ -297,14 +315,22 @@
         el.oninput = () => {
           state.dist[el.dataset.idx] = parseInt(el.value);
           document.getElementById("distval_" + el.dataset.idx).textContent = el.value + "%";
-          const total = Object.values(state.dist).reduce((a, b) => a + b, 0) || 0;
+          let total = 0;
+          document.querySelectorAll("[data-idx]").forEach((s2) => (total += parseInt(s2.value)));
           document.getElementById("distTotal").textContent = total + "%";
           document.getElementById("distWarn").textContent = total === 100 ? "" : " (ajuste para somar 100%)";
         };
       });
+      document.querySelectorAll("[data-nome-idx]").forEach((el) => {
+        el.oninput = () => {
+          state.distMembros[parseInt(el.dataset.nomeIdx)] = el.value;
+        };
+      });
       document.getElementById("btnAddMembro").onclick = () => {
-        state.distMembros = state.distMembros || ["Você", "", "", ""];
+        saveCurrentInputs();
         state.distMembros.push("");
+        const n = state.distMembros.length;
+        state.distMembros.forEach((_, i) => { state.dist[i] = Math.round(100 / n); });
         render();
       };
     }
@@ -322,6 +348,16 @@
     btn.disabled = true;
     btn.textContent = "GERANDO...";
     errEl.textContent = "";
+
+    if (state.sprintFinal && state.distMembros) {
+      const totalDist = state.distMembros.reduce((sum, _, i) => sum + (state.dist[i] ?? 0), 0);
+      if (totalDist !== 100) {
+        errEl.textContent = `A distribuição de contribuição está somando ${totalDist}%, mas precisa somar exatamente 100%. Volte à etapa "Distribuição de contribuição" e ajuste.`;
+        btn.disabled = false;
+        btn.textContent = "GERAR RELATÓRIO EM PDF";
+        return;
+      }
+    }
 
     const fd = new FormData();
     fd.append("aluno", state.aluno);
@@ -342,7 +378,7 @@
       const n = i + 1;
       fd.append(`c${n}_nota`, d.nota);
       fd.append(`c${n}_tipo`, d.tipo);
-      fd.append(`c${n}_legenda`, d.legenda);
+      fd.append(`c${n}_justificativa`, d.justificativa);
       if (d.file) fd.append(`c${n}_arquivo`, d.file);
     });
     if (state.sprintFinal && state.distMembros) {
