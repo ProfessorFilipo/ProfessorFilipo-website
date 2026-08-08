@@ -175,8 +175,23 @@ export function parse(input) {
 
   const parser = new Parser(tokens);
   try {
-    const ast = parser.parseFormula();
-    const trailing = parser.peek();
+    let ast = parser.parseFormula();
+    let trailing = parser.peek();
+
+    // Exceção deliberada e única: o conectivo binário do NÍVEL MAIS
+    // EXTERNO da entrada inteira pode ficar sem parênteses ao redor —
+    // ex.: "(¬p ∧ q) ↔ (¬p ∨ ¬q)" em vez de "((¬p ∧ q) ↔ (¬p ∨ ¬q))".
+    // Qualquer conectivo ANINHADO (dentro de uma subfórmula) continua
+    // exigindo parênteses normalmente — essa folga vale só uma vez, no
+    // topo, então "p ∧ q ∨ r" (dois conectivos ambíguos no topo) ainda
+    // é rejeitado corretamente.
+    if (trailing.type in CONNECTIVE_NODE_TYPE) {
+      const opTok = parser.advance();
+      const right = parser.parseFormula();
+      ast = BinaryOp(CONNECTIVE_NODE_TYPE[opTok.type], ast, right, ast.pos);
+      trailing = parser.peek();
+    }
+
     if (trailing.type !== TokenType.EOF) {
       const found = `"${trailing.value}"`;
       return {
