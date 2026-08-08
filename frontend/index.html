@@ -11,7 +11,7 @@
 <meta name="description" content="Doutorando na PUCRS, professor e engenheiro. Pesquisa em IA Generativa e Digital Twins, na academia e na indústria.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/main.css?v=5">
+<link rel="stylesheet" href="css/main.css?v=7">
 </head>
 <body>
 
@@ -62,6 +62,24 @@
         </div>
       </div>
     </section>
+
+    <section class="quick-access">
+      <h2>ACESSO RÁPIDO PARA ALUNOS</h2>
+      <div class="quick-links">
+        <a class="quick-link" href="autoavaliacao.html">
+          <img src="assets/icon-doc.svg" alt="" aria-hidden="true">
+          <span>Gerador de relatório de autoavaliação</span>
+        </a>
+        <a class="quick-link" href="logica.html">
+          <img src="assets/icon-logic.svg" alt="" aria-hidden="true">
+          <span>Lógica para Computação</span>
+        </a>
+        <a class="quick-link" href="ferramentas.html">
+          <img src="assets/icon-gear.svg" alt="" aria-hidden="true">
+          <span>Ferramentas para alunos</span>
+        </a>
+      </div>
+    </section>
   </main>
 
   <footer class="api-status">
@@ -78,7 +96,12 @@
     <div class="visit-counter-wrap">
       <span class="counter-label">VISITANTES:</span>
       <div class="visit-counter" id="visit-counter-digits"></div>
+      <span class="counter-since" id="counter-since"></span>
     </div>
+  </footer>
+
+  <footer class="quote-footer">
+    <p class="footer-quote" id="footer-quote"></p>
   </footer>
 
   <button class="replay-boot-btn" id="replay-boot-btn" title="Reproduzir animação de abertura novamente" aria-label="Reproduzir animação de abertura novamente">↺</button>
@@ -86,5 +109,6 @@
   <script src="js/boot.js"></script>
   <script src="js/api.js"></script>
   <script src="js/counter.js"></script>
+  <script src="js/quote.js"></script>
 </body>
 </html>

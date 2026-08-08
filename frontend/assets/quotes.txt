@@ -1,0 +1,13 @@
+# Uma citação por linha. Formato: texto da citação — Autor
+# Linhas em branco e iniciadas com # são ignoradas.
+# Sem autor conhecido/definido, pode omitir o "— Autor".
+A ciência da computação não é mais sobre computadores do que a astronomia é sobre telescópios. — Edsger W. Dijkstra
+Programas devem ser escritos para pessoas lerem, e só incidentalmente para máquinas executarem. — Harold Abelson
+A simplicidade é pré-requisito para a confiabilidade. — Edsger W. Dijkstra
+Só se pode entender verdadeiramente aquilo que se é capaz de criar. — Richard Feynman
+Antes de mais nada, prepare-se. — Abraham Lincoln
+Não existe ensino sem pesquisa e pesquisa sem ensino. — Paulo Freire
+A dúvida é o princípio da sabedoria. — Aristóteles
+Toda tecnologia suficientemente avançada é indistinguível de mágica. — Arthur C. Clarke
+Fazer as coisas de forma simples é muito mais difícil do que fazê-las de forma complicada. — Steve Jobs
+Não é o mais forte que sobrevive, nem o mais inteligente, mas o que melhor se adapta às mudanças. — atribuído a Charles Darwin

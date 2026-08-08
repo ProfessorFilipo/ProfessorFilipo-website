@@ -1,6 +1,7 @@
 /**
  * counter.js — retro 90s-style visit counter, rendered as real 7-segment
- * LED digits (CSS-drawn, not an image or font).
+ * LED digits (CSS-drawn, not an image or font). Also shows the date
+ * counting started, read from the same API response.
  *
  * Behavior: increments once per browser session (POST /counter/hit) —
  * but on every subsequent page load in that same session, it re-reads the
@@ -40,6 +41,14 @@
     container.innerHTML = digits.map(digitToHTML).join("");
   }
 
+  function renderStartedAt(startedAt) {
+    const el = document.getElementById("counter-since");
+    if (!el || !startedAt) return;
+    const [ano, mes, dia] = startedAt.split("-");
+    if (!ano || !mes || !dia) return;
+    el.textContent = `DESDE ${dia}/${mes}/${ano}`;
+  }
+
   const alreadyCounted = sessionStorage.getItem(COUNTED_FLAG) === "1";
   const endpoint = alreadyCounted ? "/counter/count" : "/counter/hit";
   const method = alreadyCounted ? "GET" : "POST";
@@ -49,6 +58,7 @@
     .then((data) => {
       if (!alreadyCounted) sessionStorage.setItem(COUNTED_FLAG, "1");
       renderDigits(data.count);
+      renderStartedAt(data.started_at);
     })
     .catch(() => {
       renderDigits(0);

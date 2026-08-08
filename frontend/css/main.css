@@ -264,6 +264,31 @@ a{color:var(--royal);text-decoration-color:var(--royal);text-underline-offset:3p
   .retro-footer{flex-direction:column;align-items:flex-start;}
 }
 
+/* ---------- quick access (home, students) ---------- */
+.quick-access{padding:8px 40px 56px;}
+.quick-access h2{font-family:var(--pixel);font-weight:700;font-size:15px;margin:0 0 20px;}
+.quick-links{display:flex;gap:16px;flex-wrap:wrap;}
+.quick-link{
+  flex:1 1 220px;display:flex;align-items:center;gap:14px;
+  padding:18px 20px;border:1px solid var(--line);border-left:4px solid var(--teal);
+  border-radius:6px;background:#fff;text-decoration:none;color:var(--ink);
+  font-family:var(--serif);font-size:15px;line-height:1.4;
+  transition:border-color .15s,transform .15s;
+}
+.quick-link img{width:28px;height:28px;flex-shrink:0;image-rendering:pixelated;}
+.quick-link:hover{border-color:var(--teal-deep);transform:translateY(-2px);}
+
+/* ---------- discreet random quote (home footer) ---------- */
+.quote-footer{padding:16px 40px 24px;text-align:center;border-top:1px solid var(--line);}
+.footer-quote{
+  font-family:var(--serif);font-style:italic;font-size:12.5px;color:var(--stone);
+  margin:0 auto;max-width:64ch;
+}
+.footer-quote-author{font-style:normal;}
+
+/* ---------- visit counter "since" date ---------- */
+.counter-since{font-family:var(--pixel);font-size:8px;color:var(--stone);white-space:nowrap;}
+
 @media (max-width:640px){
   .site-header, .hero, .page-hero, .content{padding-left:20px;padding-right:20px;}
   .hero-grid{grid-template-columns:1fr;}
