@@ -6,8 +6,13 @@ Programas devem ser escritos para pessoas lerem, e só incidentalmente para máq
 A simplicidade é pré-requisito para a confiabilidade. — Edsger W. Dijkstra
 Só se pode entender verdadeiramente aquilo que se é capaz de criar. — Richard Feynman
 Antes de mais nada, prepare-se. — Abraham Lincoln
-Não existe ensino sem pesquisa e pesquisa sem ensino. — Paulo Freire
 A dúvida é o princípio da sabedoria. — Aristóteles
 Toda tecnologia suficientemente avançada é indistinguível de mágica. — Arthur C. Clarke
+A única maneira de descobrir os limites do possível é ir além deles, rumo ao impossível. — Arthur C. Clarke
 Fazer as coisas de forma simples é muito mais difícil do que fazê-las de forma complicada. — Steve Jobs
 Não é o mais forte que sobrevive, nem o mais inteligente, mas o que melhor se adapta às mudanças. — atribuído a Charles Darwin
+Somos feitos de poeira de estrelas. — Carl Sagan
+Só se vê bem com o coração, o essencial é invisível aos olhos. — Antoine de Saint-Exupéry
+A imaginação é mais importante que o conhecimento. — Albert Einstein
+Independência ou morte! — Dom Pedro I
+Ajude-me a fazer sozinho. — Maria Montessori
