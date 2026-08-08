@@ -35,6 +35,7 @@ const TURNSTILE_ASCII = '|-';
   const examplesEl = document.getElementById('lm-examples');
   const resultEl = document.getElementById('lm-result');
   const verdictEl = document.getElementById('lm-verdict');
+  const equivalentNoteEl = document.getElementById('lm-equivalent-note');
   const counterexampleEl = document.getElementById('lm-counterexample');
   const treeWrap = document.getElementById('lm-tree-wrap');
 
@@ -69,21 +70,21 @@ const TURNSTILE_ASCII = '|-';
   function setMode(mode) {
     // Ao sair do modo argumento pro modo fórmula única, o campo principal
     // até então só mostrava a conclusão — as premissas ficavam fora de
-    // vista (ainda existiam no estado, só escondidas). Reconstrói tudo
-    // como uma única fórmula equivalente: "(premissa1) ∧ (premissa2) ∧
-    // ... → (conclusão)" — testar se ISSO é uma tautologia é exatamente
-    // equivalente a testar se o argumento original é válido, então nada
-    // se perde semanticamente, e o campo passa a mostrar tudo que estava
-    // ali. Cada premissa entra entre parênteses porque está sendo
-    // concatenada como texto cru — sem isso, uma premissa como "p∨q"
-    // mudaria de significado ao virar "p∨q ∧ outraPremissa" (o ∧ bind
-    // mais apertado que o ∨ na leitura de precedência padrão).
+    // vista (ainda existiam no estado, só escondidas). Em vez de
+    // reconstruir com "→" (que é logicamente equivalente, mas troca o
+    // símbolo que o aluno digitou — confuso, mesmo estando correto:
+    // ⊢ não é sempre → em todo sistema lógico, só coincide na lógica
+    // clássica que esta ferramenta implementa), mostra a MESMA notação
+    // de sequente que o aluno já pode digitar direto: "premissa1,
+    // premissa2 ⊢ conclusão". Nenhum símbolo é trocado — só reformata de
+    // campos separados pra uma linha só. Ao analisar essa linha de novo,
+    // maybeExpandSequent() já reconhece o ⊢ e volta pro modo argumento
+    // sozinho.
     if (state.mode === 'argument' && mode === 'formula') {
       const premises = state.premises.map((p) => p.trim()).filter(Boolean);
       const conclusion = mainInput.value.trim();
       if (premises.length) {
-        const premisesPart = premises.map((p) => `(${p})`).join(' ∧ ');
-        mainInput.value = conclusion ? `${premisesPart} → (${conclusion})` : premisesPart;
+        mainInput.value = conclusion ? `${premises.join(', ')} ⊢ ${conclusion}` : premises.join(', ');
         state.premises = [''];
       }
     }
@@ -213,15 +214,25 @@ const TURNSTILE_ASCII = '|-';
     return true;
   }
 
-  // ---------- exemplos prontos ----------
-  EXAMPLE_LEVELS.forEach((level) => {
+  // ---------- exemplos prontos (acordeão — cada nível abre/fecha
+  // independente dos outros, todos começam fechados pra não ocupar a
+  // tela toda ao carregar a página) ----------
+  EXAMPLE_LEVELS.forEach((level, i) => {
     const levelWrap = document.createElement('div');
     levelWrap.className = 'lm-example-level';
 
-    const label = document.createElement('p');
-    label.className = 'lm-example-level-label';
-    label.textContent = level.label;
-    levelWrap.appendChild(label);
+    const panelId = `lm-example-panel-${i}`;
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'lm-example-toggle';
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-controls', panelId);
+    toggle.innerHTML = `<span>${level.label}<span class="lm-example-toggle-count">(${level.examples.length})</span></span><span class="lm-example-toggle-icon">▸</span>`;
+    levelWrap.appendChild(toggle);
+
+    const panel = document.createElement('div');
+    panel.className = 'lm-example-panel';
+    panel.id = panelId;
 
     const row = document.createElement('div');
     row.className = 'lm-example-row';
@@ -233,7 +244,13 @@ const TURNSTILE_ASCII = '|-';
       btn.addEventListener('click', () => loadExample(ex));
       row.appendChild(btn);
     });
-    levelWrap.appendChild(row);
+    panel.appendChild(row);
+    levelWrap.appendChild(panel);
+
+    toggle.addEventListener('click', () => {
+      const isOpen = panel.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', String(isOpen));
+    });
 
     examplesEl.appendChild(levelWrap);
   });
@@ -284,6 +301,7 @@ const TURNSTILE_ASCII = '|-';
     let verdictHTML;
     let verdictClass;
     let counterexample = null;
+    let equivalentNote = null;
 
     try {
       if (state.mode === 'argument') {
@@ -306,6 +324,15 @@ const TURNSTILE_ASCII = '|-';
           ? 'ARGUMENTO VÁLIDO — as premissas implicam a conclusão'
           : 'ARGUMENTO INVÁLIDO — encontrado um contraexemplo';
         counterexample = tableauResult.counterexample;
+
+        // Nota só informativa, nunca editável e nunca substitui o que foi
+        // digitado — o "⊢" não é sempre equivalente a "→" em qualquer
+        // sistema lógico (só coincide na lógica clássica, por conta do
+        // teorema da dedução), então mostrar isso como uma reformulação
+        // alternativa, claramente rotulada, evita confundir a notação
+        // que o aluno efetivamente escreveu com uma reescrita silenciosa.
+        const premisesPart = premiseTexts.map((p) => `(${p})`).join(' ∧ ');
+        equivalentNote = `Forma equivalente por conjunção e implicação (válida aqui pelo teorema da dedução, na lógica clássica): ${premisesPart} → (${mainText})`;
       } else {
         const { ast, warnings } = parseOrFail(mainText, 'Fórmula');
         allWarnings.push(...warnings);
@@ -364,6 +391,13 @@ const TURNSTILE_ASCII = '|-';
 
     verdictEl.className = `lm-verdict lm-verdict-${verdictClass}`;
     verdictEl.innerHTML = verdictHTML;
+
+    if (equivalentNote) {
+      equivalentNoteEl.textContent = equivalentNote;
+      equivalentNoteEl.style.display = '';
+    } else {
+      equivalentNoteEl.style.display = 'none';
+    }
 
     if (counterexample) {
       const dominioLine = counterexample.domain.length
