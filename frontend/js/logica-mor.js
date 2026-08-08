@@ -14,7 +14,9 @@ import { renderTableauSVG } from '../tools/logica-mor/js/renderer.js';
 import { EXAMPLE_LEVELS } from '../tools/logica-mor/js/examples.js';
 import { isPropositional, generateTruthTable } from '../tools/logica-mor/js/evaluator.js';
 
-const KEYS = ['¬', '∧', '∨', '→', '↔', '∀', '∃', '(', ')', ','];
+const KEYS = ['¬', '∧', '∨', '→', '↔', '∀', '∃', '⊢', '(', ')', ','];
+const TURNSTILE_UNICODE = '⊢';
+const TURNSTILE_ASCII = '|-';
 
 (function () {
   const root = document.getElementById('lm-tool');
@@ -128,6 +130,68 @@ const KEYS = ['¬', '∧', '∨', '→', '↔', '∀', '∃', '(', ')', ','];
     feedbackEl.style.display = '';
   }
 
+  // ---------- notação de sequente (premissas ⊢ conclusão) ----------
+  // ⊢ não é um conectivo lógico — é uma relação de nível diferente
+  // (consequência entre um conjunto de premissas e uma conclusão), que
+  // o motor já expressa via checkValidity(premissas, conclusão). Em vez
+  // de ensinar o parser DE FÓRMULAS a engolir esse símbolo (o que não
+  // faria sentido semanticamente — não existe um nó de AST pra "⊢"),
+  // a UI reconhece a notação inteira digitada de uma vez e decompõe
+  // automaticamente nos campos que já existem no modo "argumento".
+  function splitTopLevel(str, separator) {
+    const parts = [];
+    let depth = 0;
+    let current = '';
+    for (const ch of str) {
+      if (ch === '(') depth++;
+      else if (ch === ')') depth--;
+      if (ch === separator && depth === 0) {
+        parts.push(current);
+        current = '';
+      } else {
+        current += ch;
+      }
+    }
+    parts.push(current);
+    return parts;
+  }
+
+  function detectSequent(text) {
+    let idx = text.indexOf(TURNSTILE_UNICODE);
+    let sepLen = TURNSTILE_UNICODE.length;
+    if (idx === -1) {
+      idx = text.indexOf(TURNSTILE_ASCII);
+      sepLen = TURNSTILE_ASCII.length;
+    }
+    if (idx === -1) return null;
+    const premisesText = text.slice(0, idx).trim();
+    const conclusionText = text.slice(idx + sepLen).trim();
+    const premises = premisesText
+      ? splitTopLevel(premisesText, ',').map((s) => s.trim()).filter(Boolean)
+      : [];
+    return { premises, conclusion: conclusionText };
+  }
+
+  // Se o campo principal contiver "⊢" (ou "|-"), decompõe em premissas +
+  // conclusão e alterna o modo automaticamente. "⊢ φ" sem nada antes
+  // (nenhuma premissa) vira modo fórmula única — é a notação padrão pra
+  // dizer "φ é um teorema", que já é exatamente o que o modo fórmula
+  // testa (tautologia/contradição/contingência).
+  function maybeExpandSequent() {
+    const seq = detectSequent(mainInput.value);
+    if (!seq) return false;
+    if (seq.premises.length === 0) {
+      setMode('formula');
+      mainInput.value = seq.conclusion;
+    } else {
+      setMode('argument');
+      state.premises = seq.premises;
+      renderPremises();
+      mainInput.value = seq.conclusion;
+    }
+    return true;
+  }
+
   // ---------- exemplos prontos ----------
   EXAMPLE_LEVELS.forEach((level) => {
     const levelWrap = document.createElement('div');
@@ -183,6 +247,8 @@ const KEYS = ['¬', '∧', '∨', '→', '↔', '∀', '∃', '(', ')', ','];
   function analyze() {
     clearFeedback();
     resultEl.style.display = 'none';
+
+    maybeExpandSequent();
 
     let mainText = mainInput.value.trim();
     if (!mainText) {
