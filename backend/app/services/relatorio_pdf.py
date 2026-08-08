@@ -81,8 +81,8 @@ def _svg(name: str) -> str:
     return (ASSETS / "icons" / name).read_text()
 
 
-def _sha256_bytes(data: bytes) -> str:
-    return hashlib.sha256(data).hexdigest()
+def _sha3_224_bytes(data: bytes) -> str:
+    return hashlib.sha3_224(data).hexdigest()
 
 
 BASE_CSS = f'''
@@ -149,9 +149,10 @@ p.evidencia-legenda {{ font-size: 8.7pt; color: var(--stone); margin: 1.8mm 0 0 
 .reflexao-box {{ background: var(--paper-2); border-left: 2pt solid var(--teal-deep); padding: 3.2mm 3.6mm; margin-bottom: 4mm; }}
 .reflexao-box .rot {{ font-family: 'Silkscreen'; font-size: 7pt; color: var(--teal-deep); text-transform: uppercase; display: block; margin-bottom: 1.4mm; }}
 
-.resultado-box {{ border: 1.2pt solid var(--teal-deep); background: var(--paper-2); padding: 5mm 6mm; margin: 3mm 0 8mm 0; display: flex; align-items: center; gap: 6mm; }}
-.resultado-nota {{ font-family: 'Silkscreen'; background: var(--teal); color: var(--paper); padding: 3mm 5mm; font-size: 15pt; white-space: nowrap; }}
+.resultado-box {{ border: 1.2pt solid var(--teal-deep); background: var(--paper-2); padding: 5mm 6mm; margin: 3mm 0 8mm 0; break-inside: avoid; page-break-inside: avoid; }}
+.resultado-nota {{ float: left; font-family: 'Silkscreen'; background: var(--teal); color: var(--paper); padding: 3mm 5mm; font-size: 15pt; white-space: nowrap; margin-right: 6mm; }}
 .resultado-nota span {{ font-size: 9pt; opacity: 0.85; }}
+.resultado-texto {{ overflow: hidden; }}
 .resultado-texto p {{ font-size: 8.9pt; color: var(--ink); margin: 0; }}
 
 .anexo-divider {{ background: var(--ink); color: var(--paper); font-family: 'Silkscreen'; font-size: 13pt; text-transform: uppercase; padding: 6mm; margin-bottom: 6mm; text-align: center; }}
@@ -215,9 +216,8 @@ def gerar_relatorio_pdf(dados: dict) -> tuple[bytes, str]:
         # Sem evidência anexada, usa um marcador estável (em vez do hash de
         # um arquivo que não existe) — o hash final ainda muda se a presença
         # de evidência mudar entre gerações.
-        partes_hash.append(_sha256_bytes(c["arquivo_bytes"]) if c.get("arquivo_bytes") else "sem-evidencia")
-    hash_final = hashlib.sha256("|".join(partes_hash).encode("utf-8")).hexdigest()
-    hash_curto = f'{hash_final[:12]}…{hash_final[-12:]}'
+        partes_hash.append(_sha3_224_bytes(c["arquivo_bytes"]) if c.get("arquivo_bytes") else "sem-evidencia")
+    hash_final = hashlib.sha3_224("|".join(partes_hash).encode("utf-8")).hexdigest()
 
     def evidencia_html(c):
         if not c.get("arquivo_bytes"):
@@ -262,7 +262,7 @@ def gerar_relatorio_pdf(dados: dict) -> tuple[bytes, str]:
         </section>'''
 
     body_html = f'''<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8">
-    <style>{BASE_CSS}{PAGE_RULE.replace("HASH_PLACEHOLDER", f"Hash de integridade (SHA-256, abreviado): {hash_curto}")}</style>
+    <style>{BASE_CSS}{PAGE_RULE.replace("HASH_PLACEHOLDER", f"Hash de integridade (SHA3-224): {hash_final}")}</style>
     </head><body>
 
     <div class="masthead">
@@ -313,7 +313,7 @@ def gerar_relatorio_pdf(dados: dict) -> tuple[bytes, str]:
       <div class="resultado-texto">
         <p>Calculada automaticamente a partir das 5 autoavaliações informadas acima — <strong>condicionada à
         aceitação das evidências pelo(a) professor(a)</strong>, conforme aviso no início deste relatório.</p>
-        <p style="margin-top:1.6mm;">Hash de integridade (SHA-256, abreviado): {hash_curto}</p>
+        <p style="margin-top:1.6mm;">Hash de integridade (SHA3-224): {hash_final}</p>
       </div>
     </div>
 
