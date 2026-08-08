@@ -82,7 +82,7 @@ no assistente).
 
 Não é hash dos bytes finais do PDF (seria autorreferente — o hash mudaria
 o arquivo que muda o hash). É SHA3-224 sobre: nome do aluno + timestamp de
-geração (UTC) + notas de cada critério + checksum de cada arquivo de
+geração (horário de Brasília, America/Sao_Paulo) + notas de cada critério + checksum de cada arquivo de
 evidência processado, concatenados. Muda se qualquer nota for alterada
 depois ou se uma evidência for trocada. Exibido por completo (sem abreviar
 — o SHA3-224 já é curto o bastante, 56 caracteres hex) no rodapé e na

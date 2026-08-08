@@ -16,8 +16,9 @@ lugares.
 import hashlib
 import io
 import string
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from weasyprint import HTML
 from pypdf import PdfReader, PdfWriter
@@ -195,7 +196,7 @@ def gerar_relatorio_pdf(dados: dict) -> tuple[bytes, str]:
 
     Retorna (pdf_bytes, hash_hex_completo).
     """
-    gerado_em = datetime.now(timezone.utc)
+    gerado_em = datetime.now(ZoneInfo("America/Sao_Paulo"))
 
     criterios = dados["criterios"]
     if len(criterios) != 5:
@@ -286,7 +287,7 @@ def gerar_relatorio_pdf(dados: dict) -> tuple[bytes, str]:
         <td><span class="label">Disciplina</span><span class="value">{dados["disciplina"]}</span></td>
         <td><span class="label">Professor(a)</span><span class="value">{dados["professor"]}</span></td>
         <td><span class="label">Período do sprint</span><span class="value">{dados["periodo_de"]} a {dados["periodo_ate"]}</span></td>
-        <td><span class="label">Gerado em</span><span class="value">{gerado_em.strftime("%d/%m/%Y, %H:%M")} (UTC)</span></td>
+        <td><span class="label">Gerado em</span><span class="value">{gerado_em.strftime("%d/%m/%Y, %H:%M")} (horário de Brasília)</span></td>
       </tr>
     </table>
 

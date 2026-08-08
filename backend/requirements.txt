@@ -14,3 +14,4 @@ weasyprint>=69,<70
 pikepdf>=9,<10
 pypdf>=5,<6
 Pillow>=11,<12
+tzdata>=2025.2

@@ -2,6 +2,7 @@
   "name": "professorfilipo-website",
   "compatibility_date": "2026-07-26",
   "assets": {
-    "directory": "."
+    "directory": ".",
+    "not_found_handling": "404-page"
   }
 }
