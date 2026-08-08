@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<title>Lógica Mór — Filipo Novo Mór</title>
+<meta name="description" content="Ferramenta gratuita de análise de lógica proposicional e de predicados, com geração de árvores de refutação (tableaux) — para alunos de Lógica para a Computação.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/main.css?v=7">
+<link rel="stylesheet" href="tools/logica-mor/css/logica-mor.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <nav class="main-nav" aria-label="Navegação principal">
+      <a href="sobre.html">SOBRE</a>
+      <a href="pesquisa.html">PESQUISA</a>
+      <a href="ensino.html">ENSINO</a>
+      <a href="ferramentas.html">FERRAMENTAS</a>
+      <a href="blog.html">BLOG</a>
+      <a href="contato.html">CONTATO</a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <div class="lang-switch">
+        <span class="current">PT-BR</span>
+        <span class="sep">/</span>
+        <a href="#" title="Versão em inglês em breve">EN-CA</a>
+      </div>
+      <a href="index.html" class="site-logo" aria-label="Filipo Novo Mór — página inicial">
+        <img src="assets/logo-photo.jpg" alt="Foto de Filipo com seu gato, o Alemão">
+      </a>
+    </div>
+  </header>
+
+  <div class="page-hero">
+    <p class="breadcrumb"><a href="index.html">INÍCIO</a><span class="sep">/</span><a href="ferramentas.html">FERRAMENTAS</a><span class="sep">/</span>LÓGICA MÓR</p>
+    <h1>Lógica Mór</h1>
+    <p>Analisa sentenças de lógica proposicional e de predicados, e monta a árvore de refutação (tableau) correspondente — pra quem está começando na disciplina de Lógica para a Computação, mas também útil pra quem já manja.</p>
+  </div>
+
+  <main class="content lm-page" id="lm-tool">
+
+    <h2>EXEMPLOS PRONTOS</h2>
+    <div class="lm-examples" id="lm-examples"></div>
+
+    <h2>ANALISAR</h2>
+
+    <div class="lm-mode-row">
+      <button type="button" class="lm-mode-btn" id="lm-mode-formula">FÓRMULA ÚNICA</button>
+      <button type="button" class="lm-mode-btn" id="lm-mode-argument">ARGUMENTO (PREMISSAS ⊢ CONCLUSÃO)</button>
+    </div>
+
+    <div class="lm-premises" id="lm-premises"></div>
+    <button type="button" class="lm-add-premise" id="lm-add-premise">+ ADICIONAR PREMISSA</button>
+
+    <div class="form-field" style="margin-bottom:6px;">
+      <label id="lm-main-label" for="lm-main-input">FÓRMULA</label>
+      <input type="text" id="lm-main-input" class="lm-formula-input" placeholder="Ex.: ∀x(Aluno(x) → Estuda(x))" autocomplete="off" spellcheck="false">
+    </div>
+
+    <div class="lm-keyboard" id="lm-keyboard"></div>
+
+    <p style="font-size:13px;color:var(--stone);margin:-10px 0 20px;">
+      Notação ASCII também funciona: <code>!</code>/<code>~</code> = ¬, <code>&amp;</code> = ∧, <code>|</code> = ∨, <code>-&gt;</code> = →, <code>&lt;-&gt;</code> = ↔, <code>forall</code> = ∀, <code>exists</code> = ∃.
+    </p>
+
+    <div class="lm-analyze-row">
+      <button type="button" class="btn primary" id="lm-analyze-btn">ANALISAR</button>
+    </div>
+
+    <div class="lm-feedback" id="lm-feedback" style="display:none;"></div>
+
+    <div class="lm-result" id="lm-result" style="display:none;">
+      <div class="lm-verdict" id="lm-verdict"></div>
+      <div class="lm-counterexample" id="lm-counterexample" style="display:none;"></div>
+
+      <div class="lm-tree-wrap" id="lm-tree-wrap"></div>
+      <div class="lm-tree-legend">
+        <span style="color:#a33;">× ramo fechado (contradição)</span>
+        <span style="color:var(--teal-deep);">○ ramo aberto (satisfazível)</span>
+        <span style="color:var(--stone);">⋯ limite de passos atingido</span>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="api-status">
+    <span id="api-status-text">Verificando conexão com a API…</span>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script type="module" src="js/logica-mor.js"></script>
+</body>
+</html>

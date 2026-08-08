@@ -1,0 +1,104 @@
+/* logica-mor.css — estilos exclusivos da ferramenta Lógica Mór.
+   Depende das variáveis CSS definidas em css/main.css (--paper, --ink,
+   --teal etc.) — este arquivo é carregado depois dele em logica-mor.html. */
+
+.lm-page{max-width:1100px;}
+
+/* ---------- modo de análise (fórmula vs argumento) ---------- */
+.lm-mode-row{display:flex;gap:10px;margin-bottom:24px;}
+.lm-mode-btn{
+  font-family:var(--pixel);font-size:10px;padding:10px 16px;
+  border:1.5px solid var(--ink);border-radius:3px;background:var(--paper);
+  color:var(--ink);cursor:pointer;
+}
+.lm-mode-btn.sel{background:var(--ink);color:var(--paper);}
+
+/* ---------- premissas / conclusão ---------- */
+.lm-premises{display:flex;flex-direction:column;gap:10px;margin-bottom:6px;}
+.lm-premise-row{display:flex;gap:8px;align-items:center;}
+.lm-premise-row input{flex:1;}
+.lm-premise-remove{
+  font-family:var(--pixel);font-size:10px;background:transparent;border:1px solid var(--line);
+  border-radius:3px;color:var(--stone);cursor:pointer;padding:8px 10px;flex-shrink:0;
+}
+.lm-premise-remove:hover{border-color:#a33;color:#a33;}
+.lm-add-premise{
+  font-family:var(--pixel);font-size:10px;background:transparent;border:none;
+  color:var(--teal-deep);cursor:pointer;padding:6px 0;text-align:left;text-decoration:underline;
+  text-decoration-color:var(--line);margin-bottom:16px;
+}
+
+.lm-formula-input{
+  width:100%;font-family:var(--serif);font-size:17px;padding:12px 14px;
+  border:1.5px solid var(--ink);border-radius:4px;background:var(--paper);color:var(--ink);
+}
+.lm-formula-input:focus{outline:2px solid var(--teal);outline-offset:1px;}
+.lm-formula-input.lm-input-error{border-color:#a33;}
+
+/* ---------- teclado virtual ---------- */
+.lm-keyboard{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 24px;}
+.lm-key{
+  font-family:var(--serif);font-size:16px;min-width:34px;padding:6px 10px;
+  border:1px solid var(--line);border-radius:3px;background:#fff;color:var(--ink);
+  cursor:pointer;line-height:1.4;
+}
+.lm-key:hover{border-color:var(--teal);background:var(--paper-2);}
+
+/* ---------- botão de analisar ---------- */
+.lm-analyze-row{margin-bottom:8px;}
+
+/* ---------- feedback do parser ---------- */
+.lm-feedback{font-family:var(--serif);font-size:14.5px;margin:14px 0;padding:12px 14px;border-radius:4px;}
+.lm-feedback.lm-fb-error{background:#fbeaea;border:1px solid #d99;color:#7a2020;}
+.lm-feedback.lm-fb-warning{background:#fff7e6;border:1px solid #e8c98a;color:#6b4c05;}
+.lm-feedback code{font-family:var(--pixel);font-size:12px;background:rgba(0,0,0,0.06);padding:1px 5px;border-radius:2px;}
+
+/* ---------- exemplos prontos ---------- */
+.lm-examples{margin:8px 0 32px;}
+.lm-example-level{margin-bottom:16px;}
+.lm-example-level-label{font-family:var(--pixel);font-size:9px;color:var(--stone);margin:0 0 8px;text-transform:uppercase;}
+.lm-example-row{display:flex;flex-wrap:wrap;gap:8px;}
+.lm-example-btn{
+  font-family:var(--serif);font-size:13px;padding:7px 12px;border:1px solid var(--line);
+  border-radius:20px;background:#fff;color:var(--ink);cursor:pointer;
+}
+.lm-example-btn:hover{border-color:var(--teal);color:var(--teal-deep);}
+
+/* ---------- resultado ---------- */
+.lm-result{margin-top:32px;}
+.lm-verdict{
+  display:inline-block;font-family:var(--pixel);font-size:11px;padding:8px 14px;
+  border-radius:3px;margin-bottom:18px;
+}
+.lm-verdict.lm-verdict-good{background:var(--teal);color:#fff;}
+.lm-verdict.lm-verdict-bad{background:var(--paper-2);color:var(--ink);border:1.5px solid var(--ink);}
+.lm-verdict.lm-verdict-warn{background:#fff2d6;color:#6b4c05;border:1px solid #e8c98a;}
+
+.lm-counterexample{
+  font-family:var(--serif);font-size:14px;background:var(--paper-2);border-left:3px solid var(--teal);
+  padding:10px 14px;margin-bottom:20px;
+}
+.lm-counterexample strong{font-family:var(--pixel);font-size:10px;display:block;margin-bottom:6px;color:var(--teal-deep);}
+
+/* ---------- árvore SVG ---------- */
+.lm-tree-wrap{
+  overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:#fff;
+  padding:20px 10px;-webkit-overflow-scrolling:touch;
+}
+.lm-tableau-svg{display:block;margin:0 auto;}
+.lm-fork-line{stroke:var(--ink);stroke-width:1.2;}
+.lm-formula-text{font-size:15px;fill:var(--ink);}
+.lm-leaf-marker{font-size:18px;font-weight:700;}
+.lm-leaf-closed{fill:#a33;}
+.lm-leaf-open{fill:var(--teal-deep);}
+.lm-leaf-undetermined{fill:var(--stone);}
+
+.lm-tree-legend{
+  display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-family:var(--pixel);font-size:9px;color:var(--stone);
+}
+.lm-tree-legend span{display:inline-flex;align-items:center;gap:5px;}
+
+@media (max-width:600px){
+  .lm-mode-row{flex-direction:column;}
+  .lm-key{min-width:30px;font-size:14px;padding:5px 8px;}
+}
