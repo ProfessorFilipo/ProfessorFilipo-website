@@ -12,7 +12,6 @@ import { parse } from '../tools/logica-mor/js/parser.js';
 import { checkSatisfiability, checkTautology, checkValidity } from '../tools/logica-mor/js/tableau.js';
 import { renderTableauSVG } from '../tools/logica-mor/js/renderer.js';
 import { EXAMPLE_LEVELS } from '../tools/logica-mor/js/examples.js';
-import { isPropositional, generateTruthTable } from '../tools/logica-mor/js/evaluator.js';
 
 const KEYS = ['¬', '∧', '∨', '→', '↔', '∀', '∃', '⊢', '(', ')', ','];
 const TURNSTILE_UNICODE = '⊢';
@@ -68,12 +67,34 @@ const TURNSTILE_ASCII = '|-';
 
   // ---------- modo de análise ----------
   function setMode(mode) {
+    // Ao sair do modo argumento pro modo fórmula única, o campo principal
+    // até então só mostrava a conclusão — as premissas ficavam fora de
+    // vista (ainda existiam no estado, só escondidas). Reconstrói tudo
+    // como uma única fórmula equivalente: "(premissa1) ∧ (premissa2) ∧
+    // ... → (conclusão)" — testar se ISSO é uma tautologia é exatamente
+    // equivalente a testar se o argumento original é válido, então nada
+    // se perde semanticamente, e o campo passa a mostrar tudo que estava
+    // ali. Cada premissa entra entre parênteses porque está sendo
+    // concatenada como texto cru — sem isso, uma premissa como "p∨q"
+    // mudaria de significado ao virar "p∨q ∧ outraPremissa" (o ∧ bind
+    // mais apertado que o ∨ na leitura de precedência padrão).
+    if (state.mode === 'argument' && mode === 'formula') {
+      const premises = state.premises.map((p) => p.trim()).filter(Boolean);
+      const conclusion = mainInput.value.trim();
+      if (premises.length) {
+        const premisesPart = premises.map((p) => `(${p})`).join(' ∧ ');
+        mainInput.value = conclusion ? `${premisesPart} → (${conclusion})` : premisesPart;
+        state.premises = [''];
+      }
+    }
+
     state.mode = mode;
     modeFormulaBtn.classList.toggle('sel', mode === 'formula');
     modeArgumentBtn.classList.toggle('sel', mode === 'argument');
     premisesWrap.style.display = mode === 'argument' ? '' : 'none';
     addPremiseBtn.style.display = mode === 'argument' ? '' : 'none';
     mainLabel.textContent = mode === 'argument' ? 'CONCLUSÃO' : 'FÓRMULA';
+    renderPremises();
     clearFeedback();
   }
   modeFormulaBtn.addEventListener('click', () => setMode('formula'));
@@ -289,35 +310,35 @@ const TURNSTILE_ASCII = '|-';
         const { ast, warnings } = parseOrFail(mainText, 'Fórmula');
         allWarnings.push(...warnings);
 
-        if (isPropositional(ast)) {
-          const { classification } = generateTruthTable(ast);
-          if (classification === 'tautologia') {
-            // Prova por refutação clássica: nega a fórmula e mostra a
-            // árvore fechando — mais revelador do que só confirmar que
-            // a fórmula original é satisfazível (o que é trivial pra
-            // qualquer tautologia).
-            tableauResult = checkTautology(ast);
-            verdictClass = 'good';
-            verdictHTML = 'TAUTOLOGIA — verdadeira em qualquer valoração (a árvore abaixo é da <em>negação</em> da fórmula, mostrando por que ela não pode ser falsa)';
-            counterexample = null;
-          } else if (classification === 'contradição') {
-            tableauResult = checkSatisfiability(ast);
+        // Classificação unificada por tableaux (funciona pra proposicional
+        // e pra predicados igual — testa validade E satisfatibilidade,
+        // sem depender de tabela-verdade, que só serve pro caso
+        // puramente proposicional):
+        //   1) É válida/tautologia? (nega e testa se fecha)
+        //   2) Se não, é insatisfazível/contradição? (testa a fórmula em si)
+        //   3) Se não, é contingente (satisfazível, mas não em toda interpretação)
+        const tautologyResult = checkTautology(ast);
+        if (tautologyResult.isTautology) {
+          // Prova por refutação clássica: nega a fórmula e mostra a
+          // árvore fechando — mais revelador do que só confirmar que a
+          // fórmula original é satisfazível (trivial pra qualquer válida).
+          tableauResult = tautologyResult;
+          verdictClass = 'good';
+          verdictHTML = 'VÁLIDA / TAUTOLOGIA — verdadeira em qualquer interpretação (a árvore abaixo é da <em>negação</em> da fórmula, mostrando por que ela não pode ser falsa)';
+          counterexample = null;
+        } else {
+          const satResult = checkSatisfiability(ast);
+          if (!satResult.satisfiable) {
+            tableauResult = satResult;
             verdictClass = 'bad';
-            verdictHTML = 'CONTRADIÇÃO — falsa em qualquer valoração';
+            verdictHTML = 'CONTRADIÇÃO / INSATISFAZÍVEL — falsa em qualquer interpretação';
             counterexample = null;
           } else {
-            tableauResult = checkSatisfiability(ast);
+            tableauResult = satResult;
             verdictClass = 'warn';
-            verdictHTML = 'CONTINGÊNCIA — verdadeira em algumas valorações, falsa em outras (a árvore mostra uma valoração que a torna verdadeira)';
-            counterexample = tableauResult.model;
+            verdictHTML = 'CONTINGENTE — verdadeira em algumas interpretações, falsa em outras (a árvore mostra uma interpretação que a torna verdadeira)';
+            counterexample = satResult.model;
           }
-        } else {
-          tableauResult = checkSatisfiability(ast);
-          verdictClass = tableauResult.satisfiable ? 'good' : 'bad';
-          verdictHTML = tableauResult.satisfiable
-            ? 'SATISFAZÍVEL — existe uma interpretação que torna a fórmula verdadeira'
-            : 'INSATISFAZÍVEL — nenhuma interpretação torna a fórmula verdadeira (contradição)';
-          counterexample = tableauResult.model;
         }
       }
     } catch (err) {
