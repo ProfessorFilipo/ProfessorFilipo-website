@@ -69,13 +69,11 @@
     sprintFinal: qs.get("final") === "1",
     periodoDe: "", periodoAte: "",
     crit: {}, reflexaoBem: "", reflexaoDif: "",
-    dist: {},
   };
   CRITERIOS.forEach((c) => (state.crit[c.id] = { nota: null, tipo: "imagem", justificativa: "", file: null }));
 
   function steps() {
     const s = ["id", ...CRITERIOS.map((c) => c.id), "reflexao"];
-    if (state.sprintFinal) s.push("dist");
     s.push("resumo");
     return s;
   }
@@ -104,7 +102,7 @@
       ${field("Professor(a)", `<input type="text" id="in_professor" value="${state.professor}" placeholder="Nome do(a) professor(a)">`)}
       ${field("Sprint atual / total", `<div style="display:flex;gap:10px;"><input type="number" min="1" max="20" id="in_sprint_num" value="${state.sprintNum}" placeholder="Ex.: 3" style="width:100px;"><input type="number" min="1" max="20" id="in_sprint_total" value="${state.sprintTotal}" placeholder="de quantos, ex.: 6" style="width:140px;"></div>`)}
       <label style="display:flex;align-items:center;gap:8px;font-family:var(--serif);font-size:14px;color:var(--ink);margin-top:4px;">
-        <input type="checkbox" id="in_final" ${state.sprintFinal ? "checked" : ""}> Este é o sprint final do projeto (inclui a etapa de distribuição de contribuição)
+        <input type="checkbox" id="in_final" ${state.sprintFinal ? "checked" : ""}> Este é o sprint final do projeto (encerramento)
       </label>
       <p class="aa-error" id="err-id"></p>
     `;
@@ -134,9 +132,11 @@
         <div class="aa-tipo-btn ${d.tipo === "imagem" ? "sel" : ""}" data-tipo="imagem">Evidência em imagem</div>
         <div class="aa-tipo-btn ${d.tipo === "documento" ? "sel" : ""}" data-tipo="documento">Evidência em PDF</div>
       </div>
+      <p class="aa-help">Anexar evidência é opcional — mas ajuda o(a) professor(a) a validar a nota.</p>
       <div class="aa-dropzone ${d.file ? "has-file" : ""}" id="dropzone">${dz}</div>
       <input type="file" id="fileInput" accept="${d.tipo === "imagem" ? "image/jpeg,image/png,image/webp" : "application/pdf"}" style="display:none;">
-      ${field("Justificativa (relacione a nota escolhida com a evidência anexada)", `<textarea id="in_justificativa" rows="3" placeholder="Ex.: escolhi a nota 4 porque concluí quase todas as tarefas do sprint dentro do prazo — o print anexado mostra o quadro com as tarefas concluídas.">${d.justificativa}</textarea>`)}
+      ${d.file ? `<button type="button" class="btn ghost" id="btnRemoverArquivo" style="font-size:10px;margin-top:8px;">REMOVER ARQUIVO</button>` : ""}
+      ${field("Justificativa (relacione a nota escolhida com a evidência, se houver)", `<textarea id="in_justificativa" rows="3" placeholder="Ex.: escolhi a nota 4 porque concluí quase todas as tarefas do sprint dentro do prazo — o print anexado mostra o quadro com as tarefas concluídas.">${d.justificativa}</textarea>`)}
       <p class="aa-error" id="err-crit"></p>
     `;
   }
@@ -147,45 +147,6 @@
       <h2>Reflexão do sprint</h2>
       ${field("O que funcionou bem", `<textarea id="in_bem" rows="3">${state.reflexaoBem}</textarea>`)}
       ${field("O que você faria diferente", `<textarea id="in_dif" rows="3">${state.reflexaoDif}</textarea>`)}
-    `;
-  }
-
-  function ensureDistInitialized() {
-    if (!state.distMembros) {
-      state.distMembros = [state.aluno || "Você", "", "", ""];
-    }
-    // Toda vez que a etapa é (re)aberta, sincroniza state.dist com o que
-    // realmente existe em distMembros — remove qualquer índice órfão (que
-    // não corresponde mais a nenhuma linha visível) e preenche o que
-    // estiver faltando. Isso impede que um valor antigo continue entrando
-    // silenciosamente na soma depois que a linha correspondente some da tela.
-    Object.keys(state.dist).forEach((k) => {
-      if (parseInt(k) >= state.distMembros.length) delete state.dist[k];
-    });
-    state.distMembros.forEach((_, i) => {
-      if (state.dist[i] === undefined) state.dist[i] = Math.round(100 / state.distMembros.length);
-    });
-  }
-
-  function renderDist() {
-    ensureDistInitialized();
-    const membros = state.distMembros;
-    const rows = membros
-      .map((m, i) => {
-        const v = state.dist[i] ?? Math.round(100 / membros.length);
-        const nomeVal = i === 0 ? (m || state.aluno || "Você") : m;
-        const nameField = `<input type="text" data-nome-idx="${i}" placeholder="${i === 0 ? "Seu nome" : "Nome do(a) colega"}" value="${nomeVal}" style="width:160px;font-family:var(--serif);font-size:14px;padding:8px;border:1px solid var(--line);border-radius:3px;">`;
-        return `<div class="aa-dist-row">${nameField}<input type="range" min="0" max="100" step="1" value="${v}" data-idx="${i}"><span class="aa-dist-val" id="distval_${i}">${v}%</span></div>`;
-      })
-      .join("");
-    const total = membros.reduce((sum, _, i) => sum + (state.dist[i] ?? 0), 0);
-    return `
-      <p class="aa-eyebrow">DISTRIBUIÇÃO DE CONTRIBUIÇÃO</p>
-      <h2>Como a equipe contribuiu</h2>
-      <p class="aa-help">Se o crédito total do projeto (100%) fosse dividido de acordo com a contribuição real de cada um, como você dividiria? A primeira linha é você (nome já preenchido, mas pode editar).</p>
-      <div id="distRows">${rows}</div>
-      <button type="button" class="btn ghost" id="btnAddMembro" style="font-size:10px;margin-top:8px;">+ ADICIONAR COLEGA</button>
-      <p style="font-family:var(--serif);font-size:14px;margin-top:16px;">Total: <strong id="distTotal">${total}%</strong> <span id="distWarn" style="color:#a33;">${total === 100 ? "" : " (ajuste para somar 100%)"}</span></p>
     `;
   }
 
@@ -200,11 +161,10 @@
     html += row("Aluno(a)", state.aluno || "<em>não preenchido</em>", list.indexOf("id"));
     CRITERIOS.forEach((c) => {
       const d = state.crit[c.id];
-      const val = d.nota ? `Nota ${d.nota}/5 · evidência em ${d.tipo}${d.file ? " · " + d.file.name : " · arquivo não anexado"}` : "<em>não preenchido</em>";
+      const val = d.nota ? `Nota ${d.nota}/5${d.file ? " · evidência em " + d.tipo + " · " + d.file.name : " · sem evidência anexada"}` : "<em>não preenchido</em>";
       html += row(`${c.num} — ${c.nome}`, val, list.indexOf(c.id));
     });
     html += row("Reflexão", state.reflexaoBem || state.reflexaoDif ? "Preenchida" : "<em>não preenchido</em>", list.indexOf("reflexao"));
-    if (state.sprintFinal) html += row("Distribuição de contribuição", "Preenchida", list.indexOf("dist"));
 
     const notas = CRITERIOS.map((c) => state.crit[c.id].nota).filter(Boolean);
     const media = notas.length ? notas.reduce((a, b) => a + b, 0) / notas.length : 0;
@@ -235,11 +195,6 @@
     } else if (s === "reflexao") {
       state.reflexaoBem = document.getElementById("in_bem")?.value ?? state.reflexaoBem;
       state.reflexaoDif = document.getElementById("in_dif")?.value ?? state.reflexaoDif;
-    } else if (s === "dist") {
-      document.querySelectorAll("[data-nome-idx]").forEach((el) => {
-        state.distMembros = state.distMembros || [];
-        state.distMembros[parseInt(el.dataset.nomeIdx)] = el.value;
-      });
     }
   }
 
@@ -257,8 +212,7 @@
       const d = state.crit[s];
       const errEl = document.getElementById("err-crit");
       if (!d.nota) { errEl.textContent = "Escolha uma nota antes de continuar."; return false; }
-      if (!d.file) { errEl.textContent = "Anexe uma evidência antes de continuar."; return false; }
-      if (!d.justificativa || !d.justificativa.trim()) { errEl.textContent = "Escreva uma justificativa relacionando a nota com a evidência antes de continuar."; return false; }
+      if (!d.justificativa || !d.justificativa.trim()) { errEl.textContent = "Escreva uma justificativa para a nota antes de continuar."; return false; }
       errEl.textContent = "";
       return true;
     }
@@ -272,7 +226,6 @@
     if (s === "id") hostEl.innerHTML = renderId();
     else if (CRITERIOS.some((c) => c.id === s)) hostEl.innerHTML = renderCriterio(CRITERIOS.find((c) => c.id === s));
     else if (s === "reflexao") hostEl.innerHTML = renderReflexao();
-    else if (s === "dist") hostEl.innerHTML = renderDist();
     else if (s === "resumo") hostEl.innerHTML = renderResumo();
 
     labelEl.textContent = `Etapa ${cur + 1} de ${list.length}`;
@@ -309,30 +262,14 @@
         document.getElementById("err-crit").textContent = "";
         render();
       };
-    }
-    if (s === "dist") {
-      document.querySelectorAll("[data-idx]").forEach((el) => {
-        el.oninput = () => {
-          state.dist[el.dataset.idx] = parseInt(el.value);
-          document.getElementById("distval_" + el.dataset.idx).textContent = el.value + "%";
-          let total = 0;
-          document.querySelectorAll("[data-idx]").forEach((s2) => (total += parseInt(s2.value)));
-          document.getElementById("distTotal").textContent = total + "%";
-          document.getElementById("distWarn").textContent = total === 100 ? "" : " (ajuste para somar 100%)";
+      const btnRemover = document.getElementById("btnRemoverArquivo");
+      if (btnRemover) {
+        btnRemover.onclick = () => {
+          d.file = null;
+          fileInput.value = "";
+          render();
         };
-      });
-      document.querySelectorAll("[data-nome-idx]").forEach((el) => {
-        el.oninput = () => {
-          state.distMembros[parseInt(el.dataset.nomeIdx)] = el.value;
-        };
-      });
-      document.getElementById("btnAddMembro").onclick = () => {
-        saveCurrentInputs();
-        state.distMembros.push("");
-        const n = state.distMembros.length;
-        state.distMembros.forEach((_, i) => { state.dist[i] = Math.round(100 / n); });
-        render();
-      };
+      }
     }
     if (s === "resumo") {
       document.querySelectorAll("[data-goto]").forEach((el) => {
@@ -348,16 +285,6 @@
     btn.disabled = true;
     btn.textContent = "GERANDO...";
     errEl.textContent = "";
-
-    if (state.sprintFinal && state.distMembros) {
-      const totalDist = state.distMembros.reduce((sum, _, i) => sum + (state.dist[i] ?? 0), 0);
-      if (totalDist !== 100) {
-        errEl.textContent = `A distribuição de contribuição está somando ${totalDist}%, mas precisa somar exatamente 100%. Volte à etapa "Distribuição de contribuição" e ajuste.`;
-        btn.disabled = false;
-        btn.textContent = "GERAR RELATÓRIO EM PDF";
-        return;
-      }
-    }
 
     const fd = new FormData();
     fd.append("aluno", state.aluno);
@@ -381,12 +308,6 @@
       fd.append(`c${n}_justificativa`, d.justificativa);
       if (d.file) fd.append(`c${n}_arquivo`, d.file);
     });
-    if (state.sprintFinal && state.distMembros) {
-      state.distMembros.forEach((nome, i) => {
-        fd.append("dist_nomes", nome || `Integrante ${i + 1}`);
-        fd.append("dist_percentuais", state.dist[i] ?? Math.round(100 / state.distMembros.length));
-      });
-    }
 
     try {
       const res = await fetch(`${API_BASE_URL}/autoavaliacao/gerar-relatorio`, { method: "POST", body: fd });

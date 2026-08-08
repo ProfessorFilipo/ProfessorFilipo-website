@@ -149,17 +149,6 @@ p.evidencia-legenda {{ font-size: 8.7pt; color: var(--stone); margin: 1.8mm 0 0 
 .reflexao-box {{ background: var(--paper-2); border-left: 2pt solid var(--teal-deep); padding: 3.2mm 3.6mm; margin-bottom: 4mm; }}
 .reflexao-box .rot {{ font-family: 'Silkscreen'; font-size: 7pt; color: var(--teal-deep); text-transform: uppercase; display: block; margin-bottom: 1.4mm; }}
 
-.dist-wrap {{ margin-top: 2mm; }}
-.dist-row {{ display: flex; align-items: center; gap: 3mm; margin-bottom: 2.6mm; }}
-.dist-nome {{ width: 46mm; font-size: 9pt; }}
-.dist-row.destaque .dist-nome {{ font-weight: 700; }}
-.dist-bar-track {{ position: relative; flex-grow: 1; height: 5mm; background: var(--paper-2); border: 0.5pt solid var(--stone); }}
-.dist-bar-fill {{ height: 100%; background: var(--teal); }}
-.dist-row.destaque .dist-bar-fill {{ background: var(--amber); }}
-.dist-cota-marker {{ position: absolute; top: -1mm; bottom: -1mm; width: 0.6pt; background: var(--ink); }}
-.dist-pct {{ width: 12mm; text-align: right; font-family: 'Silkscreen'; font-size: 8pt; }}
-p.dist-nota {{ font-size: 8.3pt; color: var(--stone); margin-top: 2mm; }}
-
 .resultado-box {{ border: 1.2pt solid var(--teal-deep); background: var(--paper-2); padding: 5mm 6mm; margin: 3mm 0 8mm 0; display: flex; align-items: center; gap: 6mm; }}
 .resultado-nota {{ font-family: 'Silkscreen'; background: var(--teal); color: var(--paper); padding: 3mm 5mm; font-size: 15pt; white-space: nowrap; }}
 .resultado-nota span {{ font-size: 9pt; opacity: 0.85; }}
@@ -199,9 +188,9 @@ def gerar_relatorio_pdf(dados: dict) -> tuple[bytes, str]:
       periodo_de, periodo_ate,
       criterios: lista de 5 dicts na ordem de CRITERIOS_ORDEM, cada um com
         {chave, nota (1-5), tipo ('imagem'|'documento'),
-         arquivo_bytes (já validado/sanitizado), nome_arquivo, legenda}
-      reflexao_bem, reflexao_dif,
-      distribuicao: lista opcional de (nome, pct, é_o_proprio_aluno)
+         arquivo_bytes (já validado/sanitizado, ou None se nenhuma evidência
+         foi anexada — evidência é opcional), nome_arquivo (idem), justificativa}
+      reflexao_bem, reflexao_dif
 
     Retorna (pdf_bytes, hash_hex_completo).
     """
@@ -211,7 +200,9 @@ def gerar_relatorio_pdf(dados: dict) -> tuple[bytes, str]:
     if len(criterios) != 5:
         raise ValueError("Esperado exatamente 5 critérios.")
 
-    documentos = [c for c in criterios if c["tipo"] == "documento"]
+    # Só entram na numeração de anexos os critérios do tipo "documento" que
+    # de fato têm um PDF de evidência anexado (evidência é opcional).
+    documentos = [c for c in criterios if c["tipo"] == "documento" and c.get("arquivo_bytes")]
     for i, c in enumerate(documentos):
         c["anexo_letra"] = string.ascii_uppercase[i]
 
@@ -221,11 +212,19 @@ def gerar_relatorio_pdf(dados: dict) -> tuple[bytes, str]:
     partes_hash = [dados["aluno"], gerado_em.isoformat()]
     for c in criterios:
         partes_hash.append(f'{c["chave"]}:{c["nota"]}')
-        partes_hash.append(_sha256_bytes(c["arquivo_bytes"]))
+        # Sem evidência anexada, usa um marcador estável (em vez do hash de
+        # um arquivo que não existe) — o hash final ainda muda se a presença
+        # de evidência mudar entre gerações.
+        partes_hash.append(_sha256_bytes(c["arquivo_bytes"]) if c.get("arquivo_bytes") else "sem-evidencia")
     hash_final = hashlib.sha256("|".join(partes_hash).encode("utf-8")).hexdigest()
     hash_curto = f'{hash_final[:12]}…{hash_final[-12:]}'
 
     def evidencia_html(c):
+        if not c.get("arquivo_bytes"):
+            return f'''
+            <div class="evidencia">
+              <p class="evidencia-legenda">Nenhuma evidência anexada — <em>{c["justificativa"]}</em></p>
+            </div>'''
         if c["tipo"] == "imagem":
             b64 = c["arquivo_bytes"]
             import base64
@@ -233,7 +232,7 @@ def gerar_relatorio_pdf(dados: dict) -> tuple[bytes, str]:
             return f'''
             <div class="evidencia">
               <img class="evidencia-img" src="{data_uri}">
-              <p class="evidencia-legenda"><em>{c["legenda"]}</em></p>
+              <p class="evidencia-legenda"><em>{c["justificativa"]}</em></p>
             </div>'''
         return f'''
         <div class="evidencia">
@@ -244,7 +243,7 @@ def gerar_relatorio_pdf(dados: dict) -> tuple[bytes, str]:
               <span class="doc-file">{c["nome_arquivo"]}</span>
             </div>
           </div>
-          <p class="evidencia-legenda"><em>{c["legenda"]}</em></p>
+          <p class="evidencia-legenda"><em>{c["justificativa"]}</em></p>
         </div>'''
 
     criterios_html = ""
@@ -261,28 +260,6 @@ def gerar_relatorio_pdf(dados: dict) -> tuple[bytes, str]:
           <p class="ancora">{ancora}</p>
           {evidencia_html(c)}
         </section>'''
-
-    dist_html = ""
-    dist_nota = ""
-    if dados.get("sprint_final") and dados.get("distribuicao"):
-        cota = 100 / len(dados["distribuicao"])
-        rows = ""
-        for nome, pct, destaque in dados["distribuicao"]:
-            cls = "dist-row destaque" if destaque else "dist-row"
-            rows += f'''
-            <div class="{cls}">
-              <span class="dist-nome">{nome}</span>
-              <div class="dist-bar-track">
-                <div class="dist-bar-fill" style="width:{pct}%"></div>
-                <div class="dist-cota-marker" style="left:{cota}%"></div>
-              </div>
-              <span class="dist-pct">{pct}%</span>
-            </div>'''
-        dist_html = f'''
-        <h2 class="section-label">{_svg("icon-chart.svg")} Distribuição de contribuição da equipe</h2>
-        <p style="font-size:8.7pt;color:var(--stone);margin:0 0 3mm 0;">Preenchida uma única vez, ao final do projeto — soma sempre 100% entre os integrantes.</p>
-        <div class="dist-wrap">{rows}</div>
-        <p class="dist-nota">O marcador em cada barra indica a cota igualitária de referência ({cota:.1f}%).</p>'''
 
     body_html = f'''<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8">
     <style>{BASE_CSS}{PAGE_RULE.replace("HASH_PLACEHOLDER", f"Hash de integridade (SHA-256, abreviado): {hash_curto}")}</style>
@@ -329,8 +306,6 @@ def gerar_relatorio_pdf(dados: dict) -> tuple[bytes, str]:
     <h2 class="section-label">{_svg("icon-cap.svg")} Reflexão do sprint</h2>
     <div class="reflexao-box"><span class="rot">O que funcionou bem</span>{dados.get("reflexao_bem", "")}</div>
     <div class="reflexao-box"><span class="rot">O que você faria diferente</span>{dados.get("reflexao_dif", "")}</div>
-
-    {dist_html}
 
     <h2 class="section-label">{_svg("icon-seal.svg")} Resultado deste sprint</h2>
     <div class="resultado-box">

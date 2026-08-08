@@ -325,10 +325,6 @@ a{color:var(--royal);text-decoration-color:var(--royal);text-underline-offset:3p
 .aa-dropzone.has-file{border-color:var(--teal);color:var(--teal-deep);border-style:solid;}
 
 /* distribuição */
-.aa-dist-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
-.aa-dist-row label{width:160px;font-family:var(--serif);font-size:14px;flex-shrink:0;}
-.aa-dist-row input[type=range]{flex:1;}
-.aa-dist-row .aa-dist-val{width:40px;text-align:right;font-family:var(--pixel);font-size:11px;}
 
 /* resumo */
 .aa-resumo-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;
