@@ -12,6 +12,7 @@
 // Notion / na memória do projeto).
 
 import { formulaToString } from './ast.js';
+import { atomKey } from './evaluator.js';
 
 const FONT_FAMILY = "'Source Serif 4', serif";
 const FONT_SIZE = 15;
@@ -36,11 +37,61 @@ function leafWidth(branch) {
   return branch.children.reduce((sum, c) => sum + leafWidth(c), 0);
 }
 
-function computeColumnWidth(root) {
+/**
+ * Numera cada fórmula da árvore, uma vez só, na ordem natural de
+ * leitura (topo → folhas, esquerda → direita nas bifurcações) — a mesma
+ * ordem em que a árvore é desenhada. Como branch.formulas é cumulativo
+ * (fork() copia tudo do ramo-pai), cada fórmula só aparece "nova" em um
+ * único lugar — a mesma lógica de slice(startIndex) usada em assign().
+ */
+function numberFormulas(root) {
+  const numbers = new Map();
+  let counter = 1;
+  (function walk(branch, startIndex) {
+    for (const entry of branch.formulas.slice(startIndex)) {
+      // Chaveado por entry.node (o nó da fórmula), não pela entrada em si —
+      // fork() reconstrói um objeto de entrada novo pra cada fórmula
+      // herdada (pra poder clonar gammaUsedConstants independentemente),
+      // mas sempre reaproveita a MESMA referência de node. Numerar pela
+      // entrada erraria toda fórmula herdada por um ramo descendente.
+      numbers.set(entry.node, counter++);
+    }
+    for (const child of branch.children) walk(child, branch.formulas.length);
+  })(root, 0);
+  return numbers;
+}
+
+function labelFor(entry, numbers) {
+  return `${numbers.get(entry.node)}. ${formulaToString(entry.node)}`;
+}
+
+/**
+ * Quando um ramo fecha, branch.closedPair já guarda a chave do átomo
+ * que apareceu com as duas polaridades (o motor usa isso internamente
+ * em tableau.js) — aqui só procuramos, na lista cumulativa de fórmulas
+ * do ramo, as duas entradas (uma positiva, uma negativa) com essa
+ * chave, e devolvemos os números delas. Não exige nenhuma mudança no
+ * motor — o dado já existia, só não estava exposto na árvore desenhada.
+ */
+function findClosingPairNumbers(branch, closedPairKey, numbers) {
+  let posNum = null;
+  let negNum = null;
+  for (const entry of branch.formulas) {
+    if (entry.classification.kind !== 'literal') continue;
+    if (atomKey(entry.classification.atom) !== closedPairKey) continue;
+    const num = numbers.get(entry.node);
+    if (entry.classification.polarity === 'positive' && posNum === null) posNum = num;
+    if (entry.classification.polarity === 'negative' && negNum === null) negNum = num;
+  }
+  if (posNum === null || negNum === null) return null;
+  return [posNum, negNum].sort((a, b) => a - b);
+}
+
+function computeColumnWidth(root, numbers) {
   let max = MIN_COL_WIDTH;
   (function walk(branch) {
     for (const entry of branch.formulas) {
-      const w = measureTextWidth(formulaToString(entry.node)) + COL_PADDING * 2;
+      const w = measureTextWidth(labelFor(entry, numbers)) + COL_PADDING * 2;
       if (w > max) max = w;
     }
     branch.children.forEach(walk);
@@ -55,7 +106,8 @@ function computeColumnWidth(root) {
  */
 export function layoutTableau(tableauResult) {
   const root = tableauResult.root;
-  const colWidth = computeColumnWidth(root);
+  const numbers = numberFormulas(root);
+  const colWidth = computeColumnWidth(root, numbers);
   const totalWidthPx = leafWidth(root) * colWidth;
 
   const texts = [];
@@ -72,18 +124,22 @@ export function layoutTableau(tableauResult) {
       texts.push({
         x: centerX,
         y: y + i * LINE_HEIGHT,
-        text: formulaToString(entry.node),
+        text: labelFor(entry, numbers),
         branchId: branch.id,
       });
     });
     const endY = y + newFormulas.length * LINE_HEIGHT;
 
     if (!branch.children.length) {
+      const closingRef = branch.closed && branch.closedPair
+        ? findClosingPairNumbers(branch, branch.closedPair, numbers)
+        : null;
       leafMarkers.push({
         x: centerX,
         y: endY + 6,
         closed: branch.closed,
         status: branch.status,
+        closingRef,
       });
       return endY;
     }
@@ -143,16 +199,14 @@ export function renderTableauSVG(tableauResult) {
 
   const markers = layout.leafMarkers
     .map((m) => {
-      let symbol = '○';
-      let cls = 'lm-leaf-open';
       if (m.closed) {
-        symbol = '×';
-        cls = 'lm-leaf-closed';
-      } else if (m.status === 'undeterminado') {
-        symbol = '⋯';
-        cls = 'lm-leaf-undetermined';
+        const ref = m.closingRef ? `<tspan class="lm-leaf-ref"> (${m.closingRef.join(', ')})</tspan>` : '';
+        return `<text x="${(m.x + dx).toFixed(1)}" y="${(m.y + dy).toFixed(1)}" text-anchor="middle" class="lm-leaf-marker lm-leaf-closed">×${ref}</text>`;
       }
-      return `<text x="${(m.x + dx).toFixed(1)}" y="${(m.y + dy).toFixed(1)}" text-anchor="middle" class="lm-leaf-marker ${cls}">${symbol}</text>`;
+      if (m.status === 'undeterminado') {
+        return `<text x="${(m.x + dx).toFixed(1)}" y="${(m.y + dy).toFixed(1)}" text-anchor="middle" class="lm-leaf-marker lm-leaf-undetermined">⋯</text>`;
+      }
+      return `<text x="${(m.x + dx).toFixed(1)}" y="${(m.y + dy).toFixed(1)}" text-anchor="middle" class="lm-leaf-marker lm-leaf-open">○</text>`;
     })
     .join('');
 

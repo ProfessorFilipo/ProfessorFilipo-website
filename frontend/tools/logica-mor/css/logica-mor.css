@@ -104,6 +104,7 @@
 .lm-fork-line{stroke:var(--ink);stroke-width:1.2;}
 .lm-formula-text{font-size:15px;fill:var(--ink);}
 .lm-leaf-marker{font-size:18px;font-weight:700;}
+.lm-leaf-ref{font-size:11px;font-weight:400;font-family:var(--serif);}
 .lm-leaf-closed{fill:#a33;}
 .lm-leaf-open{fill:var(--teal-deep);}
 .lm-leaf-undetermined{fill:var(--stone);}
