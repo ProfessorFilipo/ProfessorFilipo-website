@@ -67,6 +67,14 @@ const TURNSTILE_ASCII = '|-';
   trackFocus(mainInput);
 
   // ---------- modo de análise ----------
+  function applyModeDOM(mode) {
+    modeFormulaBtn.classList.toggle('sel', mode === 'formula');
+    modeArgumentBtn.classList.toggle('sel', mode === 'argument');
+    premisesWrap.style.display = mode === 'argument' ? '' : 'none';
+    addPremiseBtn.style.display = mode === 'argument' ? '' : 'none';
+    mainLabel.textContent = mode === 'argument' ? 'CONCLUSÃO' : 'FÓRMULA';
+  }
+
   function setMode(mode) {
     // Ao sair do modo argumento pro modo fórmula única, o campo principal
     // até então só mostrava a conclusão — as premissas ficavam fora de
@@ -103,16 +111,28 @@ const TURNSTILE_ASCII = '|-';
     }
 
     state.mode = mode;
-    modeFormulaBtn.classList.toggle('sel', mode === 'formula');
-    modeArgumentBtn.classList.toggle('sel', mode === 'argument');
-    premisesWrap.style.display = mode === 'argument' ? '' : 'none';
-    addPremiseBtn.style.display = mode === 'argument' ? '' : 'none';
-    mainLabel.textContent = mode === 'argument' ? 'CONCLUSÃO' : 'FÓRMULA';
+    applyModeDOM(mode);
     renderPremises();
     clearFeedback();
   }
   modeFormulaBtn.addEventListener('click', () => setMode('formula'));
   modeArgumentBtn.addEventListener('click', () => setMode('argument'));
+
+  // ---------- reset — limpa tudo como se a página tivesse acabado de
+  // carregar (não reaproveita setMode(), que faz reconstrução/detecção
+  // de sequente — aqui é pra zerar de verdade, sem preservar nada) ----------
+  function resetForm() {
+    state.mode = 'formula';
+    state.premises = [''];
+    mainInput.value = '';
+    applyModeDOM('formula');
+    renderPremises();
+    clearFeedback();
+    resultEl.style.display = 'none';
+    lastFocusedInput = mainInput;
+    mainInput.focus();
+  }
+  document.getElementById('lm-reset-btn').addEventListener('click', resetForm);
 
   // ---------- premissas dinâmicas ----------
   function renderPremises() {

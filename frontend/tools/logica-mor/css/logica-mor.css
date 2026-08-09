@@ -45,7 +45,7 @@
 .lm-key:hover{border-color:var(--teal);background:var(--paper-2);}
 
 /* ---------- botão de analisar ---------- */
-.lm-analyze-row{margin-bottom:8px;}
+.lm-analyze-row{margin-bottom:8px;display:flex;gap:10px;align-items:center;}
 
 /* ---------- feedback do parser ---------- */
 .lm-feedback{font-family:var(--serif);font-size:14.5px;margin:14px 0;padding:12px 14px;border-radius:4px;}
