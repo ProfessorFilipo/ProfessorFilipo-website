@@ -2,16 +2,14 @@
  * logica-mor.js — orquestrador da página da ferramenta Lógica Mór.
  * Liga o motor lógico (frontend/tools/logica-mor/js/) à UI: modo de
  * análise (fórmula única vs argumento), teclado virtual, exemplos
- * prontos, e o resultado (veredito + árvore SVG).
- *
- * Fase 1: análise completa de uma vez (sem navegação passo a passo —
- * isso é a Fase 2, que vai consumir o array `steps` já retornado por
- * buildTableau sem precisar mudar nada aqui).
+ * prontos, o resultado (veredito + árvore SVG) e a navegação passo a
+ * passo pela expansão da árvore (Fase 2).
  */
 import { parse } from '../tools/logica-mor/js/parser.js';
 import { checkSatisfiability, checkTautology, checkValidity } from '../tools/logica-mor/js/tableau.js';
-import { renderTableauSVG } from '../tools/logica-mor/js/renderer.js';
+import { renderTableauSVG, layoutTableau } from '../tools/logica-mor/js/renderer.js';
 import { EXAMPLE_LEVELS } from '../tools/logica-mor/js/examples.js';
+import { isPropositional, generateTruthTable } from '../tools/logica-mor/js/evaluator.js';
 
 const KEYS = ['¬', '∧', '∨', '→', '↔', '∀', '∃', '⊢', '(', ')', ','];
 const TURNSTILE_UNICODE = '⊢';
@@ -22,6 +20,10 @@ const TURNSTILE_ASCII = '|-';
   if (!root) return;
 
   const state = { mode: 'formula', premises: [''] };
+  let currentTableauResult = null;
+  let currentTotalSteps = 0;
+  let currentStepCaptions = [];
+  let currentStep = 0;
 
   const modeFormulaBtn = document.getElementById('lm-mode-formula');
   const modeArgumentBtn = document.getElementById('lm-mode-argument');
@@ -38,6 +40,22 @@ const TURNSTILE_ASCII = '|-';
   const equivalentNoteEl = document.getElementById('lm-equivalent-note');
   const counterexampleEl = document.getElementById('lm-counterexample');
   const treeWrap = document.getElementById('lm-tree-wrap');
+  const stepNavEl = document.getElementById('lm-step-nav');
+  const stepCounterEl = document.getElementById('lm-step-counter');
+  const stepCaptionEl = document.getElementById('lm-step-caption');
+  const stepStartBtn = document.getElementById('lm-step-start');
+  const stepPrevBtn = document.getElementById('lm-step-prev');
+  const stepNextBtn = document.getElementById('lm-step-next');
+  const stepEndBtn = document.getElementById('lm-step-end');
+  const truthTableWrap = document.getElementById('lm-truth-table-wrap');
+  const truthTableToggle = document.getElementById('lm-truth-table-toggle');
+  const truthTablePanel = document.getElementById('lm-truth-table-panel');
+  const truthTableEl = document.getElementById('lm-truth-table');
+
+  truthTableToggle.addEventListener('click', () => {
+    const isOpen = truthTablePanel.classList.toggle('open');
+    truthTableToggle.setAttribute('aria-expanded', String(isOpen));
+  });
 
   let lastFocusedInput = mainInput;
 
@@ -304,6 +322,22 @@ const TURNSTILE_ASCII = '|-';
   }
 
   // ---------- análise ----------
+  function escapeHTML(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function buildTruthTableHTML(table) {
+    const header = table.propositions.map((p) => `<th>${escapeHTML(p)}</th>`).join('') + '<th>resultado</th>';
+    const rows = table.rows
+      .map((row) => {
+        const cells = table.propositions.map((p) => `<td>${row.valuation[p] ? 'V' : 'F'}</td>`).join('');
+        const resultCell = `<td class="${row.result ? 'lm-tt-true' : 'lm-tt-false'}">${row.result ? 'V' : 'F'}</td>`;
+        return `<tr>${cells}${resultCell}</tr>`;
+      })
+      .join('');
+    return `<thead><tr>${header}</tr></thead><tbody>${rows}</tbody>`;
+  }
+
   function parseOrFail(text, label) {
     const result = parse(text.trim());
     if (!result.ok) {
@@ -336,6 +370,7 @@ const TURNSTILE_ASCII = '|-';
     let counterexample = null;
     let equivalentNote = null;
     let indeterminate = false;
+    let truthTable = null;
 
     try {
       if (state.mode === 'argument') {
@@ -382,6 +417,14 @@ const TURNSTILE_ASCII = '|-';
       } else {
         const { ast, warnings } = parseOrFail(mainText, 'Fórmula');
         allWarnings.push(...warnings);
+
+        // Tabela-verdade só faz sentido pra fórmula única puramente
+        // proposicional (generateTruthTable não lida com predicados —
+        // domínio potencialmente infinito) — independente do resultado
+        // válido/inválido/indeterminado abaixo, então calculada à parte.
+        if (isPropositional(ast)) {
+          truthTable = generateTruthTable(ast);
+        }
 
         // Classificação unificada por tableaux (funciona pra proposicional
         // e pra predicados igual — testa validade E satisfatibilidade,
@@ -461,6 +504,9 @@ const TURNSTILE_ASCII = '|-';
       // confirmado — melhor ser transparente sobre a limitação do que
       // mostrar uma parede de texto sem valor pedagógico.
       counterexampleEl.style.display = 'none';
+      stepNavEl.style.display = 'none';
+      stepCaptionEl.style.display = 'none';
+      truthTableWrap.style.display = 'none';
       treeWrap.innerHTML = `<p style="font-family:var(--serif);font-size:14.5px;padding:14px;margin:0;">
         A expansão bateu o limite de ${tableauResult.stepCount} passos sem que todos os ramos se decidissem — comum em fórmulas com padrão ∀∃ (ida e volta entre universal e existencial), que podem não terminar nesse método. Isso <strong>não</strong> significa que a resposta seja "inválido"/"insatisfazível" — só que o motor não conseguiu confirmar nem refutar dentro do orçamento de passos.
         Um contramodelo pequeno pode muito bem existir mesmo assim; encontrar o menor exigiria uma busca por modelo finito, um método diferente do que essa ferramenta usa hoje.
@@ -468,6 +514,15 @@ const TURNSTILE_ASCII = '|-';
       resultEl.style.display = '';
       resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       return;
+    }
+
+    if (truthTable) {
+      truthTableEl.innerHTML = buildTruthTableHTML(truthTable);
+      truthTableWrap.style.display = '';
+      truthTablePanel.classList.remove('open');
+      truthTableToggle.setAttribute('aria-expanded', 'false');
+    } else {
+      truthTableWrap.style.display = 'none';
     }
 
     if (counterexample) {
@@ -484,10 +539,56 @@ const TURNSTILE_ASCII = '|-';
       counterexampleEl.style.display = 'none';
     }
 
-    treeWrap.innerHTML = renderTableauSVG(tableauResult);
+    startStepNavigation(tableauResult);
     resultEl.style.display = '';
     resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
+
+  // ---------- navegação passo a passo ----------
+  // A árvore final já é calculada de uma vez pelo motor (buildTableau
+  // continua fazendo tudo de uma vez, sem mudança nenhuma nisso) — o
+  // "passo a passo" aqui é só controlar QUANTO da árvore já calculada
+  // fica visível, usando os revealStep que renderTableauSVG já calcula
+  // pra cada elemento. As posições nunca mudam ao navegar, só o que
+  // está visível.
+  function startStepNavigation(tableauResult) {
+    currentTableauResult = tableauResult;
+    const layout = layoutTableau(tableauResult);
+    currentTotalSteps = layout.totalSteps;
+    currentStepCaptions = layout.stepCaptions;
+
+    if (currentTotalSteps === 0) {
+      // Fórmula trivial (ex.: um único literal) — nenhuma regra foi
+      // aplicada, não há o que navegar. Mostra a árvore (de uma linha só)
+      // direto, sem os controles.
+      stepNavEl.style.display = 'none';
+      stepCaptionEl.style.display = 'none';
+      treeWrap.innerHTML = renderTableauSVG(tableauResult);
+      return;
+    }
+
+    stepNavEl.style.display = '';
+    stepCaptionEl.style.display = '';
+    renderAtStep(0);
+  }
+
+  function renderAtStep(n) {
+    currentStep = Math.max(0, Math.min(n, currentTotalSteps));
+    treeWrap.innerHTML = renderTableauSVG(currentTableauResult, { revealUpToStep: currentStep });
+    stepCounterEl.textContent = `PASSO ${currentStep} DE ${currentTotalSteps}`;
+    stepCaptionEl.textContent = currentStep === 0
+      ? 'Estado inicial — premissas e negação da conclusão, antes de qualquer regra ser aplicada.'
+      : currentStepCaptions[currentStep - 1];
+    stepStartBtn.disabled = currentStep === 0;
+    stepPrevBtn.disabled = currentStep === 0;
+    stepNextBtn.disabled = currentStep === currentTotalSteps;
+    stepEndBtn.disabled = currentStep === currentTotalSteps;
+  }
+
+  stepStartBtn.addEventListener('click', () => renderAtStep(0));
+  stepPrevBtn.addEventListener('click', () => renderAtStep(currentStep - 1));
+  stepNextBtn.addEventListener('click', () => renderAtStep(currentStep + 1));
+  stepEndBtn.addEventListener('click', () => renderAtStep(currentTotalSteps));
 
   analyzeBtn.addEventListener('click', analyze);
   mainInput.addEventListener('keydown', (e) => {

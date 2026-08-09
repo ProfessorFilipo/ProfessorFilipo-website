@@ -66,6 +66,56 @@ function labelFor(entry, numbers) {
 }
 
 /**
+ * Mapeia cada fórmula ao passo (1-based) que a revelou, a partir dos
+ * campos resultNode/resultNodes/resultNodesA/resultNodesB que
+ * tableau.js agora grava em cada passo. Uma fórmula sem entrada aqui é
+ * uma premissa inicial — visível desde o passo 0 (antes de qualquer
+ * regra ser aplicada).
+ */
+function buildRevealMap(steps) {
+  const revealStepOf = new Map();
+  steps.forEach((step, i) => {
+    const stepNum = i + 1;
+    if (step.resultNode) revealStepOf.set(step.resultNode, stepNum);
+    if (step.resultNodes) step.resultNodes.forEach((n) => revealStepOf.set(n, stepNum));
+    if (step.resultNodesA) step.resultNodesA.forEach((n) => revealStepOf.set(n, stepNum));
+    if (step.resultNodesB) step.resultNodesB.forEach((n) => revealStepOf.set(n, stepNum));
+  });
+  return revealStepOf;
+}
+
+function readableRule(rule) {
+  return rule.replace(/_/g, ' ');
+}
+
+/**
+ * Monta uma legenda em português pra cada passo, referenciando os
+ * números já atribuídos às fórmulas (os mesmos números mostrados na
+ * árvore) — assim a legenda e o desenho sempre falam a mesma língua.
+ */
+function buildStepCaptions(tableauResult, numbers) {
+  return tableauResult.steps.map((step, i) => {
+    const n = (node) => numbers.get(node);
+    const rule = readableRule(step.rule);
+    const source = n(step.source);
+    if (step.kind === 'alpha') {
+      return `Passo ${i + 1}: ${rule} em ${source} → ${step.resultNodes.map(n).join(', ')}`;
+    }
+    if (step.kind === 'delta') {
+      return `Passo ${i + 1}: ${rule} em ${source} → ${n(step.resultNode)} (constante nova: ${step.freshConstant})`;
+    }
+    if (step.kind === 'gamma') {
+      const seeded = step.seededFreshConstant ? ` (primeira constante do ramo: ${step.seededFreshConstant})` : '';
+      return `Passo ${i + 1}: ${rule} em ${source} → ${n(step.resultNode)} (instanciado com ${step.instantiatedWith})${seeded}`;
+    }
+    if (step.kind === 'beta') {
+      return `Passo ${i + 1}: ${rule} em ${source} → ramo esquerdo: ${step.resultNodesA.map(n).join(', ')} · ramo direito: ${step.resultNodesB.map(n).join(', ')}`;
+    }
+    return `Passo ${i + 1}: ${rule}`;
+  });
+}
+
+/**
  * Quando um ramo fecha, branch.closedPair já guarda a chave do átomo
  * que apareceu com as duas polaridades (o motor usa isso internamente
  * em tableau.js) — aqui só procuramos, na lista cumulativa de fórmulas
@@ -102,11 +152,16 @@ function computeColumnWidth(root, numbers) {
 /**
  * Calcula as posições de todo o layout a partir do resultado de
  * buildTableau(). Não desenha nada — retorna dados puros de geometria,
- * o que facilita testar o layout isoladamente da renderização.
+ * o que facilita testar o layout isoladamente da renderização. Cada
+ * texto/linha/marcador carrega um `revealStep` — o passo (0 = premissas
+ * iniciais, antes de qualquer regra) a partir do qual deve aparecer,
+ * usado pelo modo passo a passo pra desenhar só uma parte da árvore
+ * final sem recalcular geometria nenhuma.
  */
 export function layoutTableau(tableauResult) {
   const root = tableauResult.root;
   const numbers = numberFormulas(root);
+  const revealStepOf = buildRevealMap(tableauResult.steps);
   const colWidth = computeColumnWidth(root, numbers);
   const totalWidthPx = leafWidth(root) * colWidth;
 
@@ -114,18 +169,22 @@ export function layoutTableau(tableauResult) {
   const forkLines = [];
   const leafMarkers = [];
 
-  function assign(branch, xStart, widthPx, y, startIndex) {
+  function assign(branch, xStart, widthPx, y, startIndex, incomingRevealStep) {
     // branch.formulas é cumulativo (cada fork() copia tudo do ramo-pai) —
     // só desenhamos as entradas NOVAS deste segmento, a partir de
     // startIndex (o tamanho que o ramo-pai já tinha ao bifurcar).
     const newFormulas = branch.formulas.slice(startIndex);
     const centerX = xStart + widthPx / 2;
+    let lastRevealStep = incomingRevealStep;
     newFormulas.forEach((entry, i) => {
+      const revealStep = revealStepOf.get(entry.node) ?? 0;
+      lastRevealStep = Math.max(lastRevealStep, revealStep);
       texts.push({
         x: centerX,
         y: y + i * LINE_HEIGHT,
         text: labelFor(entry, numbers),
         branchId: branch.id,
+        revealStep,
       });
     });
     const endY = y + newFormulas.length * LINE_HEIGHT;
@@ -140,9 +199,16 @@ export function layoutTableau(tableauResult) {
         closed: branch.closed,
         status: branch.status,
         closingRef,
+        revealStep: lastRevealStep,
       });
       return endY;
     }
+
+    // As duas linhas de um mesmo garfo sempre vêm do mesmo passo β —
+    // um ramo só bifurca uma vez, então basta achar esse passo por
+    // branchId.
+    const betaStepIndex = tableauResult.steps.findIndex((s) => s.kind === 'beta' && s.branchId === branch.id);
+    const forkRevealStep = betaStepIndex === -1 ? lastRevealStep : betaStepIndex + 1;
 
     const totalChildLeafW = branch.children.reduce((s, c) => s + leafWidth(c), 0);
     let cursorX = xStart;
@@ -151,15 +217,15 @@ export function layoutTableau(tableauResult) {
       const childLeafW = leafWidth(child);
       const childWidthPx = (widthPx * childLeafW) / totalChildLeafW;
       const childCenterX = cursorX + childWidthPx / 2;
-      forkLines.push({ x1: centerX, y1: endY, x2: childCenterX, y2: endY + FORK_GAP - 10 });
-      const childEndY = assign(child, cursorX, childWidthPx, endY + FORK_GAP, branch.formulas.length);
+      forkLines.push({ x1: centerX, y1: endY, x2: childCenterX, y2: endY + FORK_GAP - 10, revealStep: forkRevealStep });
+      const childEndY = assign(child, cursorX, childWidthPx, endY + FORK_GAP, branch.formulas.length, forkRevealStep);
       if (childEndY > maxChildEndY) maxChildEndY = childEndY;
       cursorX += childWidthPx;
     }
     return maxChildEndY;
   }
 
-  const totalHeightPx = assign(root, 0, totalWidthPx, LINE_HEIGHT * 0.7, 0);
+  const totalHeightPx = assign(root, 0, totalWidthPx, LINE_HEIGHT * 0.7, 0, 0);
 
   return {
     texts,
@@ -167,6 +233,8 @@ export function layoutTableau(tableauResult) {
     leafMarkers,
     width: totalWidthPx,
     height: totalHeightPx,
+    totalSteps: tableauResult.steps.length,
+    stepCaptions: buildStepCaptions(tableauResult, numbers),
   };
 }
 
@@ -181,8 +249,15 @@ function escapeXML(str) {
  * Renderiza o resultado de buildTableau() como uma string SVG completa
  * e independente (viewBox + xmlns), pronta pra injetar via innerHTML ou
  * baixar como arquivo .svg.
+ *
+ * options.revealUpToStep (opcional): quando fornecido, desenha só os
+ * elementos cujo revealStep é menor ou igual a esse valor — a árvore
+ * inteira já está posicionada (mesmas coordenadas sempre), só alguns
+ * elementos ficam de fora. Omitido (ou Infinity) = árvore completa,
+ * comportamento de sempre.
  */
-export function renderTableauSVG(tableauResult) {
+export function renderTableauSVG(tableauResult, options = {}) {
+  const revealUpToStep = options.revealUpToStep ?? Infinity;
   const layout = layoutTableau(tableauResult);
   const w = layout.width + SIDE_MARGIN * 2;
   const h = layout.height + TOP_MARGIN + BOTTOM_MARGIN;
@@ -190,14 +265,17 @@ export function renderTableauSVG(tableauResult) {
   const dy = TOP_MARGIN;
 
   const lines = layout.forkLines
+    .filter((f) => f.revealStep <= revealUpToStep)
     .map((f) => `<line x1="${(f.x1 + dx).toFixed(1)}" y1="${(f.y1 + dy).toFixed(1)}" x2="${(f.x2 + dx).toFixed(1)}" y2="${(f.y2 + dy).toFixed(1)}" class="lm-fork-line"/>`)
     .join('');
 
   const texts = layout.texts
-    .map((t) => `<text x="${(t.x + dx).toFixed(1)}" y="${(t.y + dy).toFixed(1)}" text-anchor="middle" class="lm-formula-text">${escapeXML(t.text)}</text>`)
+    .filter((t) => t.revealStep <= revealUpToStep)
+    .map((t) => `<text x="${(t.x + dx).toFixed(1)}" y="${(t.y + dy).toFixed(1)}" text-anchor="middle" class="lm-formula-text${t.revealStep > 0 ? ' lm-formula-derived' : ''}">${escapeXML(t.text)}</text>`)
     .join('');
 
   const markers = layout.leafMarkers
+    .filter((m) => m.revealStep <= revealUpToStep)
     .map((m) => {
       if (m.closed) {
         const ref = m.closingRef ? `<tspan class="lm-leaf-ref"> (${m.closingRef.join(', ')})</tspan>` : '';

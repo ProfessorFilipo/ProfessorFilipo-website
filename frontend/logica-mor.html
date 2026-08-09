@@ -84,11 +84,29 @@
       <p class="lm-equivalent-note" id="lm-equivalent-note" style="display:none;"></p>
       <div class="lm-counterexample" id="lm-counterexample" style="display:none;"></div>
 
+      <div class="lm-step-nav" id="lm-step-nav" style="display:none;">
+        <button type="button" class="btn ghost" id="lm-step-start" title="Voltar ao início">⏮</button>
+        <button type="button" class="btn ghost" id="lm-step-prev" title="Passo anterior">◀ ANTERIOR</button>
+        <span class="lm-step-counter" id="lm-step-counter"></span>
+        <button type="button" class="btn ghost" id="lm-step-next" title="Próximo passo">PRÓXIMO ▶</button>
+        <button type="button" class="btn ghost" id="lm-step-end" title="Pular pro fim">VER TUDO ⏭</button>
+      </div>
+      <p class="lm-step-caption" id="lm-step-caption"></p>
+
       <div class="lm-tree-wrap" id="lm-tree-wrap"></div>
       <div class="lm-tree-legend">
         <span style="color:#a33;">× ramo fechado (contradição)</span>
         <span style="color:var(--teal-deep);">○ ramo aberto (satisfazível)</span>
         <span style="color:var(--stone);">⋯ limite de passos atingido</span>
+      </div>
+
+      <div class="lm-example-level" id="lm-truth-table-wrap" style="display:none;">
+        <button type="button" class="lm-example-toggle" id="lm-truth-table-toggle" aria-expanded="false" aria-controls="lm-truth-table-panel">
+          <span>TABELA-VERDADE</span><span class="lm-example-toggle-icon">▸</span>
+        </button>
+        <div class="lm-example-panel" id="lm-truth-table-panel">
+          <table class="lm-truth-table" id="lm-truth-table"></table>
+        </div>
       </div>
     </div>
 

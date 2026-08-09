@@ -95,6 +95,16 @@
 }
 .lm-counterexample strong{font-family:var(--pixel);font-size:10px;display:block;margin-bottom:6px;color:var(--teal-deep);}
 
+/* ---------- passo a passo ---------- */
+.lm-step-nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+.lm-step-nav .btn{font-size:10px;padding:8px 12px;}
+.lm-step-nav .btn:disabled{opacity:0.35;cursor:default;}
+.lm-step-counter{font-family:var(--pixel);font-size:10px;color:var(--stone);white-space:nowrap;}
+.lm-step-caption{
+  font-family:var(--serif);font-style:italic;font-size:13.5px;color:var(--ink);
+  background:var(--paper-2);border-left:3px solid var(--teal);padding:8px 12px;margin:0 0 14px;
+}
+
 /* ---------- árvore SVG ---------- */
 .lm-tree-wrap{
   overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:#fff;
@@ -113,6 +123,13 @@
   display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-family:var(--pixel);font-size:9px;color:var(--stone);
 }
 .lm-tree-legend span{display:inline-flex;align-items:center;gap:5px;}
+
+/* ---------- tabela-verdade ---------- */
+.lm-truth-table{border-collapse:collapse;width:100%;font-family:var(--serif);font-size:13.5px;}
+.lm-truth-table th,.lm-truth-table td{border:1px solid var(--line);padding:6px 12px;text-align:center;}
+.lm-truth-table th{font-family:var(--pixel);font-size:9px;background:var(--paper-2);text-transform:uppercase;}
+.lm-truth-table td.lm-tt-true{color:var(--teal-deep);font-weight:600;}
+.lm-truth-table td.lm-tt-false{color:var(--stone);}
 
 @media (max-width:600px){
   .lm-mode-row{flex-direction:column;}

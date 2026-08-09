@@ -280,8 +280,14 @@ class TableauBuilder {
 
     if (c.kind === 'alpha') {
       entry.done = true;
-      for (const r of c.results) this.addFormula(branch, r);
-      this.steps.push({ rule: c.rule, kind: 'alpha', branchId: branch.id, source: entry.node });
+      const resultEntries = c.results.map((r) => this.addFormula(branch, r));
+      this.steps.push({
+        rule: c.rule,
+        kind: 'alpha',
+        branchId: branch.id,
+        source: entry.node,
+        resultNodes: resultEntries.map((e) => e.node),
+      });
       return;
     }
 
@@ -289,8 +295,15 @@ class TableauBuilder {
       entry.done = true;
       const fresh = `c${this.nextConstantIndex++}`;
       const instance = substitute(c.body, c.variable, fresh);
-      this.addFormula(branch, instance);
-      this.steps.push({ rule: c.rule, kind: 'delta', branchId: branch.id, source: entry.node, freshConstant: fresh });
+      const resultEntry = this.addFormula(branch, instance);
+      this.steps.push({
+        rule: c.rule,
+        kind: 'delta',
+        branchId: branch.id,
+        source: entry.node,
+        freshConstant: fresh,
+        resultNode: resultEntry.node,
+      });
       return;
     }
 
@@ -306,7 +319,7 @@ class TableauBuilder {
       if (unused === undefined) return; // nada a fazer agora (será revisitado se surgir constante nova)
       entry.gammaUsedConstants.add(unused);
       const instance = substitute(c.body, c.variable, unused);
-      this.addFormula(branch, instance);
+      const resultEntry = this.addFormula(branch, instance);
       this.steps.push({
         rule: c.rule,
         kind: 'gamma',
@@ -314,6 +327,7 @@ class TableauBuilder {
         source: entry.node,
         instantiatedWith: unused,
         seededFreshConstant: seeded,
+        resultNode: resultEntry.node,
       });
       return;
     }
@@ -321,6 +335,7 @@ class TableauBuilder {
     if (c.kind === 'beta') {
       entry.done = true;
       const [optionA, optionB] = c.branches;
+      const parentLen = branch.formulas.length;
       const childA = this.fork(branch, optionA);
       const childB = this.fork(branch, optionB);
       branch.children = [childA, childB];
@@ -330,6 +345,11 @@ class TableauBuilder {
         branchId: branch.id,
         source: entry.node,
         resultBranchIds: [childA.id, childB.id],
+        // Fórmulas novas de cada ramo — fork() as adiciona por último via
+        // addFormula, então são exatamente as entradas após o tamanho que
+        // o ramo-pai já tinha antes de bifurcar.
+        resultNodesA: childA.formulas.slice(parentLen).map((e) => e.node),
+        resultNodesB: childB.formulas.slice(parentLen).map((e) => e.node),
       });
       return;
     }
