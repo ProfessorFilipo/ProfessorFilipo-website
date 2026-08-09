@@ -87,6 +87,19 @@ const TURNSTILE_ASCII = '|-';
         mainInput.value = conclusion ? `${premises.join(', ')} ⊢ ${conclusion}` : premises.join(', ');
         state.premises = [''];
       }
+    } else if (state.mode === 'formula' && mode === 'argument') {
+      // Caminho inverso do de cima — se o campo já contém um sequente
+      // (por ter sido reconstruído na troca anterior, ou por ter sido
+      // digitado direto), reconhece e preenche as premissas de novo. Sem
+      // isso, ir e voltar entre os dois modos fazia as premissas
+      // sumirem — o texto continuava lá, só nunca era relido de volta
+      // pros campos, e só era detectado na hora de clicar "Analisar", não
+      // na troca de modo em si.
+      const seq = detectSequent(mainInput.value);
+      if (seq && seq.premises.length) {
+        state.premises = seq.premises;
+        mainInput.value = seq.conclusion;
+      }
     }
 
     state.mode = mode;
