@@ -327,12 +327,17 @@ const TURNSTILE_ASCII = '|-';
   }
 
   function buildTruthTableHTML(table) {
-    const header = table.propositions.map((p) => `<th>${escapeHTML(p)}</th>`).join('') + '<th>resultado</th>';
+    const propHeader = table.propositions.map((p) => `<th>${escapeHTML(p)}</th>`).join('');
+    const subHeader = table.subformulaLabels.map((s) => `<th class="lm-tt-sub">${escapeHTML(s)}</th>`).join('');
+    const header = `${propHeader}${subHeader}<th>resultado</th>`;
     const rows = table.rows
       .map((row) => {
-        const cells = table.propositions.map((p) => `<td>${row.valuation[p] ? 'V' : 'F'}</td>`).join('');
+        const propCells = table.propositions.map((p) => `<td>${row.valuation[p] ? 'V' : 'F'}</td>`).join('');
+        const subCells = row.subformulaResults
+          .map((v) => `<td class="lm-tt-sub">${v ? 'V' : 'F'}</td>`)
+          .join('');
         const resultCell = `<td class="${row.result ? 'lm-tt-true' : 'lm-tt-false'}">${row.result ? 'V' : 'F'}</td>`;
-        return `<tr>${cells}${resultCell}</tr>`;
+        return `<tr>${propCells}${subCells}${resultCell}</tr>`;
       })
       .join('');
     return `<thead><tr>${header}</tr></thead><tbody>${rows}</tbody>`;

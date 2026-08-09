@@ -8,7 +8,7 @@
 // quantificadores/predicados, conforme a seção 7 da especificação
 // (domínio de predicados é potencialmente infinito).
 
-import { NodeType } from './ast.js';
+import { NodeType, formulaToString } from './ast.js';
 
 export class EvaluationError extends Error {}
 
@@ -79,6 +79,36 @@ export function collectPropositions(node, seen = [], acc = new Set()) {
 }
 
 /**
+ * Coleta as subfórmulas compostas (não-atômicas) de uma fórmula
+ * proposicional, em pós-ordem (filhos antes do pai — "de dentro pra
+ * fora", esquerda pra direita) — a ordem em que uma tabela-verdade de
+ * livro-texto costuma construir as colunas intermediárias, cada uma a
+ * partir das anteriores. Deduplicada pelo texto (formulaToString): a
+ * mesma subfórmula aparecendo em dois pontos da árvore vira uma única
+ * coluna, já que tem sempre o mesmo valor sob a mesma valoração.
+ */
+export function collectSubformulas(node, acc = [], seen = new Set()) {
+  if (node.type === NodeType.PROPOSITION) return acc;
+  if (node.type === NodeType.NOT) {
+    collectSubformulas(node.operand, acc, seen);
+  } else if (
+    node.type === NodeType.AND ||
+    node.type === NodeType.OR ||
+    node.type === NodeType.IMPLIES ||
+    node.type === NodeType.IFF
+  ) {
+    collectSubformulas(node.left, acc, seen);
+    collectSubformulas(node.right, acc, seen);
+  }
+  const label = formulaToString(node);
+  if (!seen.has(label)) {
+    seen.add(label);
+    acc.push(node);
+  }
+  return acc;
+}
+
+/**
  * Avalia a fórmula sob uma valoração — objeto { chaveDoAtomo: boolean }.
  * Lança EvaluationError se algum átomo não tiver valor na valoração,
  * ou se a fórmula tiver quantificadores (não suportado sem domínio).
@@ -114,11 +144,14 @@ export function evaluate(node, valuation) {
 }
 
 /**
- * Gera a tabela-verdade completa de uma fórmula puramente proposicional.
+ * Gera a tabela-verdade completa de uma fórmula puramente proposicional
+ * — inclui as colunas intermediárias (cada subfórmula composta), no
+ * estilo de livro-texto, além do resultado final.
  *
  * @returns {{
  *   propositions: string[],
- *   rows: { valuation: Record<string, boolean>, result: boolean }[],
+ *   subformulaLabels: string[],
+ *   rows: { valuation: Record<string, boolean>, subformulaResults: boolean[], result: boolean }[],
  *   classification: 'tautologia' | 'contradição' | 'contingência'
  * }}
  */
@@ -130,6 +163,13 @@ export function generateTruthTable(node) {
   }
 
   const propositions = collectPropositions(node);
+  // A raiz da fórmula também é "composta", então entra na lista de
+  // subfórmulas — mas ela já vira a coluna final "resultado" separada,
+  // então é removida daqui pra não duplicar (sempre a última entrada,
+  // já que collectSubformulas é pós-ordem e a raiz nunca é sintaticamente
+  // igual a nenhuma subfórmula própria dela mesma).
+  const subformulas = collectSubformulas(node).slice(0, -1);
+  const subformulaLabels = subformulas.map((n) => formulaToString(n));
   const n = propositions.length;
   const rows = [];
 
@@ -140,13 +180,14 @@ export function generateTruthTable(node) {
       const bit = (mask >> (n - 1 - i)) & 1;
       valuation[propositions[i]] = bit === 1;
     }
+    const subformulaResults = subformulas.map((sub) => evaluate(sub, valuation));
     const result = evaluate(node, valuation);
-    rows.push({ valuation, result });
+    rows.push({ valuation, subformulaResults, result });
   }
 
   const allTrue = rows.every((r) => r.result === true);
   const allFalse = rows.every((r) => r.result === false);
   const classification = allTrue ? 'tautologia' : allFalse ? 'contradição' : 'contingência';
 
-  return { propositions, rows, classification };
+  return { propositions, subformulaLabels, rows, classification };
 }

@@ -128,6 +128,8 @@
 .lm-truth-table{border-collapse:collapse;width:100%;font-family:var(--serif);font-size:13.5px;}
 .lm-truth-table th,.lm-truth-table td{border:1px solid var(--line);padding:6px 12px;text-align:center;}
 .lm-truth-table th{font-family:var(--pixel);font-size:9px;background:var(--paper-2);text-transform:uppercase;}
+.lm-truth-table th.lm-tt-sub{font-family:var(--serif);font-size:12px;font-style:italic;text-transform:none;font-weight:400;}
+.lm-truth-table td.lm-tt-sub{color:var(--stone);font-size:12.5px;}
 .lm-truth-table td.lm-tt-true{color:var(--teal-deep);font-weight:600;}
 .lm-truth-table td.lm-tt-false{color:var(--stone);}
 
