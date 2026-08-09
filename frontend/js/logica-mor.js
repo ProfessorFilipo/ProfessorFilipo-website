@@ -302,6 +302,7 @@ const TURNSTILE_ASCII = '|-';
     let verdictClass;
     let counterexample = null;
     let equivalentNote = null;
+    let indeterminate = false;
 
     try {
       if (state.mode === 'argument') {
@@ -319,11 +320,23 @@ const TURNSTILE_ASCII = '|-';
         allWarnings.push(...warnings);
 
         tableauResult = checkValidity(premiseASTs, conclusionAST);
-        verdictClass = tableauResult.valid ? 'good' : 'bad';
-        verdictHTML = tableauResult.valid
-          ? 'ARGUMENTO VÁLIDO — as premissas implicam a conclusão'
-          : 'ARGUMENTO INVÁLIDO — encontrado um contraexemplo';
-        counterexample = tableauResult.counterexample;
+        if (tableauResult.limitReached) {
+          // O ramo que não fechou pode significar duas coisas bem
+          // diferentes: o argumento é mesmo inválido, OU ele é válido mas
+          // precisaria de mais passos pra provar (o método não teve tempo
+          // de terminar). "allClosed=false" não distingue essas duas
+          // situações — então NÃO dá pra afirmar "inválido" com confiança
+          // aqui, mesmo que tecnicamente nenhum ramo tenha fechado ainda.
+          indeterminate = true;
+          verdictClass = 'warn';
+          verdictHTML = 'INDETERMINADO — o motor não conseguiu decidir dentro do limite de passos';
+        } else {
+          verdictClass = tableauResult.valid ? 'good' : 'bad';
+          verdictHTML = tableauResult.valid
+            ? 'ARGUMENTO VÁLIDO — as premissas implicam a conclusão'
+            : 'ARGUMENTO INVÁLIDO — encontrado um contraexemplo';
+          counterexample = tableauResult.counterexample;
+        }
 
         // Nota só informativa, nunca editável e nunca substitui o que foi
         // digitado — o "⊢" não é sempre equivalente a "→" em qualquer
@@ -342,8 +355,13 @@ const TURNSTILE_ASCII = '|-';
         // sem depender de tabela-verdade, que só serve pro caso
         // puramente proposicional):
         //   1) É válida/tautologia? (nega e testa se fecha)
-        //   2) Se não, é insatisfazível/contradição? (testa a fórmula em si)
-        //   3) Se não, é contingente (satisfazível, mas não em toda interpretação)
+        //   2) Se não fechou por ter batido o limite de passos, é
+        //      indeterminado — "não é tautologia" só é uma conclusão
+        //      segura quando o ramo da negação genuinamente ficou aberto
+        //      (decidido), não quando o motor só não teve tempo de decidir.
+        //   3) Senão, testa se é insatisfazível/contradição — mesma lógica.
+        //   4) Só resta contingente quando ambos os testes concluíram de
+        //      verdade, sem bater o limite em nenhum dos dois.
         const tautologyResult = checkTautology(ast);
         if (tautologyResult.isTautology) {
           // Prova por refutação clássica: nega a fórmula e mostra a
@@ -353,9 +371,19 @@ const TURNSTILE_ASCII = '|-';
           verdictClass = 'good';
           verdictHTML = 'VÁLIDA / TAUTOLOGIA — verdadeira em qualquer interpretação (a árvore abaixo é da <em>negação</em> da fórmula, mostrando por que ela não pode ser falsa)';
           counterexample = null;
+        } else if (tautologyResult.limitReached) {
+          indeterminate = true;
+          tableauResult = tautologyResult;
+          verdictClass = 'warn';
+          verdictHTML = 'INDETERMINADO — o motor não conseguiu decidir dentro do limite de passos';
         } else {
           const satResult = checkSatisfiability(ast);
-          if (!satResult.satisfiable) {
+          if (satResult.limitReached && !satResult.satisfiable) {
+            indeterminate = true;
+            tableauResult = satResult;
+            verdictClass = 'warn';
+            verdictHTML = 'INDETERMINADO — o motor não conseguiu decidir dentro do limite de passos';
+          } else if (!satResult.satisfiable) {
             tableauResult = satResult;
             verdictClass = 'bad';
             verdictHTML = 'CONTRADIÇÃO / INSATISFAZÍVEL — falsa em qualquer interpretação';
@@ -383,20 +411,30 @@ const TURNSTILE_ASCII = '|-';
       showFeedback('warning', `<ul style="margin:0;padding-left:20px;">${items}</ul>`);
     }
 
-    if (tableauResult.limitReached) {
-      const note = document.createElement('p');
-      note.textContent = '⚠ O limite de passos foi atingido antes de todos os ramos se decidirem — a árvore abaixo pode estar incompleta.';
-      verdictHTML += `<br><small>${note.textContent}</small>`;
-    }
-
     verdictEl.className = `lm-verdict lm-verdict-${verdictClass}`;
     verdictEl.innerHTML = verdictHTML;
 
-    if (equivalentNote) {
+    if (equivalentNote && !indeterminate) {
       equivalentNoteEl.textContent = equivalentNote;
       equivalentNoteEl.style.display = '';
     } else {
       equivalentNoteEl.style.display = 'none';
+    }
+
+    if (indeterminate) {
+      // Nada de despejar uma árvore gigante e inútil (formatos com padrão
+      // ∀∃ podem gerar centenas de nós antes de bater o limite de passos,
+      // sem nunca decidir) nem um "contraexemplo" que não foi de fato
+      // confirmado — melhor ser transparente sobre a limitação do que
+      // mostrar uma parede de texto sem valor pedagógico.
+      counterexampleEl.style.display = 'none';
+      treeWrap.innerHTML = `<p style="font-family:var(--serif);font-size:14.5px;padding:14px;margin:0;">
+        A expansão bateu o limite de ${tableauResult.stepCount} passos sem que todos os ramos se decidissem — comum em fórmulas com padrão ∀∃ (ida e volta entre universal e existencial), que podem não terminar nesse método. Isso <strong>não</strong> significa que a resposta seja "inválido"/"insatisfazível" — só que o motor não conseguiu confirmar nem refutar dentro do orçamento de passos.
+        Um contramodelo pequeno pode muito bem existir mesmo assim; encontrar o menor exigiria uma busca por modelo finito, um método diferente do que essa ferramenta usa hoje.
+      </p>`;
+      resultEl.style.display = '';
+      resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      return;
     }
 
     if (counterexample) {
