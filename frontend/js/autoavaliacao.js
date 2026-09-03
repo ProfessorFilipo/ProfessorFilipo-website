@@ -60,6 +60,13 @@
   };
 
   const MAX_IMG_MB = 5, MAX_PDF_MB = 5;
+  // Mesmos limites do backend (backend/app/routers/autoavaliacao.py) —
+  // travados aqui via maxlength pra nunca deixar o aluno digitar além do
+  // que o servidor aceita. Um aluno relatou um 422 disparado justamente
+  // por uma justificativa passar de 500 caracteres; o campo não tinha
+  // nem maxlength nem contador, então não havia como ele perceber o
+  // limite antes de tentar gerar o relatório.
+  const MAX_LEN = { aluno: 200, turma: 120, equipe: 120, professor: 200, reflexao: 2000, justificativa: 500 };
 
   const qs = new URLSearchParams(window.location.search);
   const state = {
@@ -95,11 +102,11 @@
       <p class="aa-eyebrow">IDENTIFICAÇÃO</p>
       <h2>Vamos começar</h2>
       <p class="aa-help">Turma, professor(a) e disciplina já vêm preenchidos quando o link é aberto a partir do Moodle.</p>
-      ${field("Nome completo", `<input type="text" id="in_aluno" value="${state.aluno}" placeholder="Seu nome completo">`)}
+      ${field("Nome completo", `<input type="text" id="in_aluno" value="${state.aluno}" placeholder="Seu nome completo" maxlength="${MAX_LEN.aluno}">`)}
       ${field("Matrícula", `<input type="text" id="in_matricula" value="${state.matricula}" placeholder="00.000.000-0">`)}
-      ${field("Equipe", `<input type="text" id="in_equipe" value="${state.equipe}" placeholder="Nome da equipe">`)}
-      ${field("Turma", `<input type="text" id="in_turma" value="${state.turma}" placeholder="Ex.: PES-2026/2 — Turma A">`)}
-      ${field("Professor(a)", `<input type="text" id="in_professor" value="${state.professor}" placeholder="Nome do(a) professor(a)">`)}
+      ${field("Equipe", `<input type="text" id="in_equipe" value="${state.equipe}" placeholder="Nome da equipe" maxlength="${MAX_LEN.equipe}">`)}
+      ${field("Turma", `<input type="text" id="in_turma" value="${state.turma}" placeholder="Ex.: PES-2026/2 — Turma A" maxlength="${MAX_LEN.turma}">`)}
+      ${field("Professor(a)", `<input type="text" id="in_professor" value="${state.professor}" placeholder="Nome do(a) professor(a)" maxlength="${MAX_LEN.professor}">`)}
       ${field("Sprint atual / total", `<div style="display:flex;gap:10px;"><input type="number" min="1" max="20" id="in_sprint_num" value="${state.sprintNum}" placeholder="Ex.: 3" style="width:100px;"><input type="number" min="1" max="20" id="in_sprint_total" value="${state.sprintTotal}" placeholder="de quantos, ex.: 6" style="width:140px;"></div>`)}
       <label style="display:flex;align-items:center;gap:8px;font-family:var(--serif);font-size:14px;color:var(--ink);margin-top:4px;">
         <input type="checkbox" id="in_final" ${state.sprintFinal ? "checked" : ""}> Este é o sprint final do projeto (encerramento)
@@ -136,7 +143,7 @@
       <div class="aa-dropzone ${d.file ? "has-file" : ""}" id="dropzone">${dz}</div>
       <input type="file" id="fileInput" accept="${d.tipo === "imagem" ? "image/jpeg,image/png,image/webp" : "application/pdf"}" style="display:none;">
       ${d.file ? `<button type="button" class="btn ghost" id="btnRemoverArquivo" style="font-size:10px;margin-top:8px;">REMOVER ARQUIVO</button>` : ""}
-      ${field("Justificativa (relacione a nota escolhida com a evidência, se houver)", `<textarea id="in_justificativa" rows="3" placeholder="Ex.: escolhi a nota 4 porque concluí quase todas as tarefas do sprint dentro do prazo — o print anexado mostra o quadro com as tarefas concluídas.">${d.justificativa}</textarea>`)}
+      ${field("Justificativa (relacione a nota escolhida com a evidência, se houver)", `<textarea id="in_justificativa" rows="3" maxlength="${MAX_LEN.justificativa}" placeholder="Ex.: escolhi a nota 4 porque concluí quase todas as tarefas do sprint dentro do prazo — o print anexado mostra o quadro com as tarefas concluídas.">${d.justificativa}</textarea><p id="justif-count" style="font-family:var(--pixel);font-size:9px;color:var(--stone);text-align:right;margin:4px 0 0;"></p>`)}
       <p class="aa-error" id="err-crit"></p>
     `;
   }
@@ -145,8 +152,8 @@
     return `
       <p class="aa-eyebrow">REFLEXÃO</p>
       <h2>Reflexão do sprint</h2>
-      ${field("O que funcionou bem", `<textarea id="in_bem" rows="3">${state.reflexaoBem}</textarea>`)}
-      ${field("O que você faria diferente", `<textarea id="in_dif" rows="3">${state.reflexaoDif}</textarea>`)}
+      ${field("O que funcionou bem", `<textarea id="in_bem" rows="3" maxlength="${MAX_LEN.reflexao}">${state.reflexaoBem}</textarea>`)}
+      ${field("O que você faria diferente", `<textarea id="in_dif" rows="3" maxlength="${MAX_LEN.reflexao}">${state.reflexaoDif}</textarea>`)}
     `;
   }
 
@@ -205,6 +212,12 @@
         errEl.textContent = "Preencha nome, turma, professor(a) e o sprint atual/total antes de continuar.";
         return false;
       }
+      const num = parseInt(state.sprintNum, 10);
+      const total = parseInt(state.sprintTotal, 10);
+      if (!Number.isInteger(num) || num < 1 || num > 20 || !Number.isInteger(total) || total < 1 || total > 20) {
+        errEl.textContent = "Sprint atual e total devem ser números inteiros entre 1 e 20.";
+        return false;
+      }
       errEl.textContent = "";
       return true;
     }
@@ -247,6 +260,15 @@
       document.querySelectorAll(".aa-tipo-btn").forEach((el) => {
         el.onclick = () => { saveCurrentInputs(); d.tipo = el.dataset.tipo; d.file = null; render(); };
       });
+      const justifEl = document.getElementById("in_justificativa");
+      const justifCountEl = document.getElementById("justif-count");
+      function updateJustifCount() {
+        const len = justifEl.value.length;
+        justifCountEl.textContent = `${len}/${MAX_LEN.justificativa} caracteres`;
+        justifCountEl.style.color = len >= MAX_LEN.justificativa ? "#a33" : "var(--stone)";
+      }
+      justifEl.oninput = updateJustifCount;
+      updateJustifCount();
       const dropzone = document.getElementById("dropzone");
       const fileInput = document.getElementById("fileInput");
       dropzone.onclick = () => fileInput.click();
@@ -279,12 +301,72 @@
     }
   }
 
+  const FIELD_LABELS = {
+    aluno: "Nome", matricula: "Matrícula", turma: "Turma", equipe: "Equipe",
+    professor: "Professor(a)", disciplina: "Disciplina",
+    sprint_num: "Sprint atual", sprint_total: "Sprint total", sprint_final: "Sprint final",
+    periodo_de: "Período (de)", periodo_ate: "Período (até)",
+    reflexao_bem: "Reflexão — o que funcionou bem", reflexao_dif: "Reflexão — o que faria diferente",
+  };
+  CRITERIOS.forEach((c) => {
+    FIELD_LABELS[`${c.id}_nota`] = `${c.nome} — nota`;
+    FIELD_LABELS[`${c.id}_tipo`] = `${c.nome} — tipo de evidência`;
+    FIELD_LABELS[`${c.id}_justificativa`] = `${c.nome} — justificativa`;
+    FIELD_LABELS[`${c.id}_arquivo`] = `${c.nome} — arquivo de evidência`;
+  });
+
+  // O backend responde erros de dois jeitos bem diferentes: nossos próprios
+  // HTTPException (ex.: arquivo grande demais) mandam {"detail": "texto"} —
+  // uma string simples. Mas erros de validação automática do FastAPI (ex.:
+  // um campo chegando vazio, fora de faixa, ou grande demais) mandam
+  // {"detail": [{"loc": [...], "msg": "..."}]} — uma LISTA de objetos. Sem
+  // tratar os dois formatos, o segundo caso virava "new Error(umArray)",
+  // que o JS converte pra "[object Object]" ao exibir — exatamente o erro
+  // ilegível que os alunos reportaram (um deles bateu nisso justamente por
+  // uma justificativa passar de 500 caracteres).
+  function extractErrorMessage(body) {
+    if (typeof body.detail === "string" && body.detail.trim()) return body.detail;
+    if (Array.isArray(body.detail) && body.detail.length) {
+      const linhas = body.detail.map((e) => {
+        const campo = Array.isArray(e.loc) ? e.loc[e.loc.length - 1] : null;
+        const label = (campo && FIELD_LABELS[campo]) || campo || "campo desconhecido";
+        return `${label}: ${e.msg || "valor inválido"}`;
+      });
+      return "Erro de validação — " + linhas.join("; ");
+    }
+    return "Falha ao gerar o relatório.";
+  }
+
   async function gerarRelatorio() {
     const btn = document.getElementById("btnGerar");
     const errEl = document.getElementById("err-resumo");
+    errEl.textContent = "";
+
+    // Validação defensiva de novo, mesmo que a navegação sequencial
+    // (Anterior/Próximo) e os maxlength dos campos já devessem garantir
+    // isso — alunos relataram erros 422 do servidor por um critério
+    // chegando sem nota válida, e por uma justificativa passando de 500
+    // caracteres. Barrar aqui evita mandar dados inválidos pro servidor
+    // de qualquer forma, com uma mensagem que aponta exatamente pra onde
+    // voltar.
+    for (const c of CRITERIOS) {
+      const d = state.crit[c.id];
+      if (!Number.isInteger(d.nota) || d.nota < 1 || d.nota > 5) {
+        errEl.textContent = `Falta escolher uma nota válida no critério "${c.nome}" — clique em EDITAR nesse critério antes de gerar o relatório.`;
+        return;
+      }
+      if (!d.justificativa || !d.justificativa.trim()) {
+        errEl.textContent = `Falta escrever a justificativa no critério "${c.nome}" — clique em EDITAR nesse critério antes de gerar o relatório.`;
+        return;
+      }
+      if (d.justificativa.length > MAX_LEN.justificativa) {
+        errEl.textContent = `A justificativa do critério "${c.nome}" tem ${d.justificativa.length} caracteres — o máximo é ${MAX_LEN.justificativa}. Volte lá e resuma um pouco.`;
+        return;
+      }
+    }
+
     btn.disabled = true;
     btn.textContent = "GERANDO...";
-    errEl.textContent = "";
 
     const fd = new FormData();
     fd.append("aluno", state.aluno);
@@ -313,7 +395,7 @@
       const res = await fetch(`${API_BASE_URL}/autoavaliacao/gerar-relatorio`, { method: "POST", body: fd });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body.detail || "Falha ao gerar o relatório.");
+        throw new Error(extractErrorMessage(body));
       }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
