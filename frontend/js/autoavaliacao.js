@@ -152,8 +152,8 @@
     return `
       <p class="aa-eyebrow">REFLEXÃO</p>
       <h2>Reflexão do sprint</h2>
-      ${field("O que funcionou bem", `<textarea id="in_bem" rows="3" maxlength="${MAX_LEN.reflexao}">${state.reflexaoBem}</textarea>`)}
-      ${field("O que você faria diferente", `<textarea id="in_dif" rows="3" maxlength="${MAX_LEN.reflexao}">${state.reflexaoDif}</textarea>`)}
+      ${field("O que funcionou bem", `<textarea id="in_bem" rows="3" maxlength="${MAX_LEN.reflexao}">${state.reflexaoBem}</textarea><p id="bem-count" style="font-family:var(--pixel);font-size:9px;color:var(--stone);text-align:right;margin:4px 0 0;"></p>`)}
+      ${field("O que você faria diferente", `<textarea id="in_dif" rows="3" maxlength="${MAX_LEN.reflexao}">${state.reflexaoDif}</textarea><p id="dif-count" style="font-family:var(--pixel);font-size:9px;color:var(--stone);text-align:right;margin:4px 0 0;"></p>`)}
     `;
   }
 
@@ -293,6 +293,25 @@
         };
       }
     }
+    if (s === "reflexao") {
+      // Esse passo nunca teve handler nenhum ligado — os campos eram
+      // <textarea> só de exibição, sem contador nem checagem ao vivo,
+      // até um aluno conseguir passar de 2000 caracteres num deles e o
+      // 422 do servidor barrar só na hora de gerar o relatório.
+      const wireCounter = (inputId, counterId) => {
+        const el = document.getElementById(inputId);
+        const counterEl = document.getElementById(counterId);
+        function update() {
+          const len = el.value.length;
+          counterEl.textContent = `${len}/${MAX_LEN.reflexao} caracteres`;
+          counterEl.style.color = len >= MAX_LEN.reflexao ? "#a33" : "var(--stone)";
+        }
+        el.oninput = update;
+        update();
+      };
+      wireCounter("in_bem", "bem-count");
+      wireCounter("in_dif", "dif-count");
+    }
     if (s === "resumo") {
       document.querySelectorAll("[data-goto]").forEach((el) => {
         el.onclick = () => { cur = parseInt(el.dataset.goto); render(); };
@@ -345,10 +364,27 @@
     // Validação defensiva de novo, mesmo que a navegação sequencial
     // (Anterior/Próximo) e os maxlength dos campos já devessem garantir
     // isso — alunos relataram erros 422 do servidor por um critério
-    // chegando sem nota válida, e por uma justificativa passando de 500
-    // caracteres. Barrar aqui evita mandar dados inválidos pro servidor
-    // de qualquer forma, com uma mensagem que aponta exatamente pra onde
-    // voltar.
+    // chegando sem nota válida, por uma justificativa passando de 500
+    // caracteres, e por uma reflexão passando de 2000. maxlength só trava
+    // digitação/colagem normal — não é impossível de contornar por outros
+    // meios (edição direta do campo, por exemplo) — então essa checagem
+    // revê TODOS os campos com limite de tamanho no servidor, não só os
+    // que já bateram na prática, pra fechar essa classe de erro de vez.
+    const camposComLimite = [
+      [state.aluno, MAX_LEN.aluno, "Nome"],
+      [state.turma, MAX_LEN.turma, "Turma"],
+      [state.equipe, MAX_LEN.equipe, "Equipe"],
+      [state.professor, MAX_LEN.professor, "Professor(a)"],
+      [state.reflexaoBem, MAX_LEN.reflexao, "Reflexão — o que funcionou bem"],
+      [state.reflexaoDif, MAX_LEN.reflexao, "Reflexão — o que faria diferente"],
+    ];
+    for (const [valor, limite, nomeCampo] of camposComLimite) {
+      if (valor && valor.length > limite) {
+        errEl.textContent = `O campo "${nomeCampo}" tem ${valor.length} caracteres — o máximo é ${limite}. Volte lá e resuma um pouco.`;
+        return;
+      }
+    }
+
     for (const c of CRITERIOS) {
       const d = state.crit[c.id];
       if (!Number.isInteger(d.nota) || d.nota < 1 || d.nota > 5) {
