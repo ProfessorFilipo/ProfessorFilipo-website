@@ -133,6 +133,14 @@
 .lm-truth-table td.lm-tt-true{color:var(--teal-deep);font-weight:600;}
 .lm-truth-table td.lm-tt-false{color:var(--stone);}
 
+/* ---------- comparador de oposição ---------- */
+.lm-compare-caveat{
+  font-family:var(--serif);font-style:italic;font-size:12.5px;color:var(--stone);
+  margin:-8px 0 18px;max-width:70ch;
+}
+.lm-compare-caveat a{color:var(--teal-deep);}
+.lm-compare-table th{white-space:nowrap;}
+
 @media (max-width:600px){
   .lm-mode-row{flex-direction:column;}
   .lm-key{min-width:30px;font-size:14px;padding:5px 8px;}

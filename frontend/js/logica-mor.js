@@ -10,10 +10,20 @@ import { checkSatisfiability, checkTautology, checkValidity } from '../tools/log
 import { renderTableauSVG, layoutTableau } from '../tools/logica-mor/js/renderer.js';
 import { EXAMPLE_LEVELS } from '../tools/logica-mor/js/examples.js';
 import { isPropositional, generateTruthTable } from '../tools/logica-mor/js/evaluator.js';
+import { compareFormulas } from '../tools/logica-mor/js/oposicao.js';
 
 const KEYS = ['¬', '∧', '∨', '→', '↔', '∀', '∃', '⊢', '(', ')', ','];
 const TURNSTILE_UNICODE = '⊢';
 const TURNSTILE_ASCII = '|-';
+const RELATION_LABELS = {
+  contraditorias: 'CONTRADITÓRIAS — nunca podem ter o mesmo valor de verdade (uma é sempre o oposto da outra)',
+  contrarias: 'CONTRÁRIAS — não podem ser ambas verdadeiras, mas podem ser ambas falsas',
+  subcontrarias: 'SUBCONTRÁRIAS — não podem ser ambas falsas, mas podem ser ambas verdadeiras',
+  equivalentes: 'EQUIVALENTES — sempre têm o mesmo valor de verdade',
+  subalterna_a_implica_b: 'SUBALTERNAÇÃO — A implica B, mas B não implica A',
+  subalterna_b_implica_a: 'SUBALTERNAÇÃO — B implica A, mas A não implica B',
+  independentes: 'INDEPENDENTES — nenhuma relação especial entre elas (todas as combinações são possíveis)',
+};
 
 (function () {
   const root = document.getElementById('lm-tool');
@@ -27,10 +37,17 @@ const TURNSTILE_ASCII = '|-';
 
   const modeFormulaBtn = document.getElementById('lm-mode-formula');
   const modeArgumentBtn = document.getElementById('lm-mode-argument');
+  const modeCompareBtn = document.getElementById('lm-mode-compare');
   const premisesWrap = document.getElementById('lm-premises');
   const addPremiseBtn = document.getElementById('lm-add-premise');
+  const mainFieldEl = document.getElementById('lm-main-field');
   const mainInput = document.getElementById('lm-main-input');
   const mainLabel = document.getElementById('lm-main-label');
+  const compareWrapEl = document.getElementById('lm-compare-wrap');
+  const compareAInput = document.getElementById('lm-compare-a');
+  const compareBInput = document.getElementById('lm-compare-b');
+  const asciiHelpEl = document.getElementById('lm-ascii-help');
+  const sequentHelpEl = document.getElementById('lm-sequent-help');
   const keyboard = document.getElementById('lm-keyboard');
   const analyzeBtn = document.getElementById('lm-analyze-btn');
   const feedbackEl = document.getElementById('lm-feedback');
@@ -51,6 +68,9 @@ const TURNSTILE_ASCII = '|-';
   const truthTableToggle = document.getElementById('lm-truth-table-toggle');
   const truthTablePanel = document.getElementById('lm-truth-table-panel');
   const truthTableEl = document.getElementById('lm-truth-table');
+  const compareResultEl = document.getElementById('lm-compare-result');
+  const compareVerdictEl = document.getElementById('lm-compare-verdict');
+  const compareTableEl = document.getElementById('lm-compare-table');
 
   truthTableToggle.addEventListener('click', () => {
     const isOpen = truthTablePanel.classList.toggle('open');
@@ -83,14 +103,20 @@ const TURNSTILE_ASCII = '|-';
     input.addEventListener('focus', () => (lastFocusedInput = input));
   }
   trackFocus(mainInput);
+  trackFocus(compareAInput);
+  trackFocus(compareBInput);
 
   // ---------- modo de análise ----------
   function applyModeDOM(mode) {
     modeFormulaBtn.classList.toggle('sel', mode === 'formula');
     modeArgumentBtn.classList.toggle('sel', mode === 'argument');
+    modeCompareBtn.classList.toggle('sel', mode === 'compare');
     premisesWrap.style.display = mode === 'argument' ? '' : 'none';
     addPremiseBtn.style.display = mode === 'argument' ? '' : 'none';
+    mainFieldEl.style.display = mode === 'compare' ? 'none' : '';
+    compareWrapEl.style.display = mode === 'compare' ? '' : 'none';
     mainLabel.textContent = mode === 'argument' ? 'CONCLUSÃO' : 'FÓRMULA';
+    sequentHelpEl.style.display = mode === 'compare' ? 'none' : '';
   }
 
   function setMode(mode) {
@@ -135,6 +161,7 @@ const TURNSTILE_ASCII = '|-';
   }
   modeFormulaBtn.addEventListener('click', () => setMode('formula'));
   modeArgumentBtn.addEventListener('click', () => setMode('argument'));
+  modeCompareBtn.addEventListener('click', () => setMode('compare'));
 
   // ---------- reset — limpa tudo como se a página tivesse acabado de
   // carregar (não reaproveita setMode(), que faz reconstrução/detecção
@@ -143,10 +170,13 @@ const TURNSTILE_ASCII = '|-';
     state.mode = 'formula';
     state.premises = [''];
     mainInput.value = '';
+    compareAInput.value = '';
+    compareBInput.value = '';
     applyModeDOM('formula');
     renderPremises();
     clearFeedback();
     resultEl.style.display = 'none';
+    compareResultEl.style.display = 'none';
     lastFocusedInput = mainInput;
     mainInput.focus();
   }
@@ -312,12 +342,17 @@ const TURNSTILE_ASCII = '|-';
       state.premises = [...ex.premises];
       renderPremises();
       mainInput.value = ex.conclusion;
+    } else if (ex.mode === 'compare') {
+      setMode('compare');
+      compareAInput.value = ex.formulaA;
+      compareBInput.value = ex.formulaB;
     } else {
       setMode('formula');
       mainInput.value = ex.formula;
     }
     clearFeedback();
     resultEl.style.display = 'none';
+    compareResultEl.style.display = 'none';
     analyze();
   }
 
@@ -357,6 +392,12 @@ const TURNSTILE_ASCII = '|-';
   function analyze() {
     clearFeedback();
     resultEl.style.display = 'none';
+    compareResultEl.style.display = 'none';
+
+    if (state.mode === 'compare') {
+      analyzeCompare();
+      return;
+    }
 
     maybeExpandSequent();
 
@@ -547,6 +588,77 @@ const TURNSTILE_ASCII = '|-';
     startStepNavigation(tableauResult);
     resultEl.style.display = '';
     resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // ---------- comparador de oposição ----------
+  function analyzeCompare() {
+    const textA = compareAInput.value.trim();
+    const textB = compareBInput.value.trim();
+    if (!textA || !textB) {
+      showFeedback('error', 'Digite as duas fórmulas (A e B) para comparar.');
+      return;
+    }
+
+    let astA;
+    let astB;
+    const allWarnings = [];
+    try {
+      const rA = parseOrFail(textA, 'Fórmula A');
+      astA = rA.ast;
+      allWarnings.push(...rA.warnings);
+      const rB = parseOrFail(textB, 'Fórmula B');
+      astB = rB.ast;
+      allWarnings.push(...rB.warnings);
+    } catch (err) {
+      if (err && err.label !== undefined) {
+        showFeedback('error', `<strong>${err.label}:</strong> ${err.message} (posição ${err.pos})`);
+      } else {
+        showFeedback('error', 'Ocorreu um erro inesperado ao analisar. Confira as fórmulas.');
+        console.error(err);
+      }
+      return;
+    }
+
+    if (allWarnings.length) {
+      const items = allWarnings.map((w) => `<li><strong>${w.label}:</strong> ${w.message}</li>`).join('');
+      showFeedback('warning', `<ul style="margin:0;padding-left:20px;">${items}</ul>`);
+    }
+
+    const cmp = compareFormulas(astA, astB);
+
+    if (cmp.limitReached) {
+      compareVerdictEl.className = 'lm-verdict lm-verdict-warn';
+      compareVerdictEl.textContent = 'INDETERMINADO — o motor não conseguiu decidir uma ou mais das combinações dentro do limite de passos';
+      compareTableEl.innerHTML = '';
+      compareResultEl.style.display = '';
+      compareResultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      return;
+    }
+
+    const relationLabels = cmp.relations.map((r) => RELATION_LABELS[r] || r);
+    compareVerdictEl.className = `lm-verdict ${cmp.relations.includes('independentes') ? 'lm-verdict-warn' : 'lm-verdict-good'}`;
+    compareVerdictEl.innerHTML = relationLabels.join('<br>');
+
+    const degenerateNotes = [];
+    if (cmp.degenerateA) degenerateNotes.push(`A é uma ${cmp.degenerateA} por si só`);
+    if (cmp.degenerateB) degenerateNotes.push(`B é uma ${cmp.degenerateB} por si só`);
+    const degenerateHTML = degenerateNotes.length
+      ? `<tr><td colspan="2" style="text-align:left;font-style:italic;color:var(--stone);">⚠ ${degenerateNotes.join(' · ')} — isso costuma explicar relações inesperadas.</td></tr>`
+      : '';
+
+    compareTableEl.innerHTML = `
+      <thead><tr><th>Combinação</th><th>Possível?</th></tr></thead>
+      <tbody>
+        <tr><td>A e B, ambas verdadeiras</td><td class="${cmp.combos.pAndQ.satisfiable ? 'lm-tt-true' : 'lm-tt-false'}">${cmp.combos.pAndQ.satisfiable ? 'SIM' : 'NÃO'}</td></tr>
+        <tr><td>A verdadeira, B falsa</td><td class="${cmp.combos.pAndNotQ.satisfiable ? 'lm-tt-true' : 'lm-tt-false'}">${cmp.combos.pAndNotQ.satisfiable ? 'SIM' : 'NÃO'}</td></tr>
+        <tr><td>A falsa, B verdadeira</td><td class="${cmp.combos.notPAndQ.satisfiable ? 'lm-tt-true' : 'lm-tt-false'}">${cmp.combos.notPAndQ.satisfiable ? 'SIM' : 'NÃO'}</td></tr>
+        <tr><td>A e B, ambas falsas</td><td class="${cmp.combos.notPAndNotQ.satisfiable ? 'lm-tt-true' : 'lm-tt-false'}">${cmp.combos.notPAndNotQ.satisfiable ? 'SIM' : 'NÃO'}</td></tr>
+        ${degenerateHTML}
+      </tbody>
+    `;
+
+    compareResultEl.style.display = '';
+    compareResultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
   // ---------- navegação passo a passo ----------

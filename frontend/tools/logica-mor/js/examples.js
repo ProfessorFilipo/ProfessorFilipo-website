@@ -1,13 +1,14 @@
 // examples.js — conjunto de exemplos prontos (ver especificação técnica,
 // seção 11, e a página "Ferramenta: Lógica Mór" no Notion).
 //
-// Cada exemplo é ou modo "formula" (uma fórmula única — testa
-// satisfatibilidade dela mesma) ou modo "argument" (premissas ⊢
-// conclusão — testa validade). Os quatro itens do quadrado de oposição
-// (nível 5) foram desmembrados em quatro exemplos individuais
-// carregáveis — o conjunto original os listava como um grupo de 4 para
-// comparação par a par, mas o comparador de oposição (fase 3) ainda não
-// existe, então cada um é útil isoladamente por enquanto.
+// Cada exemplo é modo "formula" (uma fórmula única — testa validade e
+// satisfatibilidade dela mesma), "argument" (premissas ⊢ conclusão —
+// testa validade do argumento), ou "compare" (duas fórmulas A/B — testa
+// a relação de oposição entre elas, fase 3). Os quatro itens do
+// quadrado de oposição clássico (A/E/I/O) continuam individuais no
+// nível "Quadrado de oposição" (úteis sozinhos, pra ver a árvore de
+// cada um) — o nível "Comparador de oposição" reaproveita as mesmas
+// fórmulas em pares, agora que o comparador existe.
 
 export const EXAMPLE_LEVELS = [
   {
@@ -65,6 +66,47 @@ export const EXAMPLE_LEVELS = [
       { id: 'categorica-e', title: 'E — Universal negativa', mode: 'formula', formula: '∀x(Aluno(x) → ¬Estuda(x))' },
       { id: 'categorica-i', title: 'I — Particular afirmativa', mode: 'formula', formula: '∃x(Aluno(x) ∧ Estuda(x))' },
       { id: 'categorica-o', title: 'O — Particular negativa', mode: 'formula', formula: '∃x(Aluno(x) ∧ ¬Estuda(x))' },
+    ],
+  },
+  {
+    id: 'comparador',
+    label: 'Comparador de oposição (A vs B)',
+    examples: [
+      {
+        id: 'comparar-a-o',
+        title: 'A vs O (contraditórias)',
+        mode: 'compare',
+        formulaA: '∀x(Aluno(x) → Estuda(x))',
+        formulaB: '∃x(Aluno(x) ∧ ¬Estuda(x))',
+      },
+      {
+        id: 'comparar-e-i',
+        title: 'E vs I (contraditórias)',
+        mode: 'compare',
+        formulaA: '∀x(Aluno(x) → ¬Estuda(x))',
+        formulaB: '∃x(Aluno(x) ∧ Estuda(x))',
+      },
+      {
+        id: 'comparar-a-e',
+        title: 'A vs E (clássico "contrárias" — mas quebra sem importação existencial)',
+        mode: 'compare',
+        formulaA: '∀x(Aluno(x) → Estuda(x))',
+        formulaB: '∀x(Aluno(x) → ¬Estuda(x))',
+      },
+      {
+        id: 'comparar-prop-contraditorias',
+        title: 'p vs ¬p (contraditórias, proposicional)',
+        mode: 'compare',
+        formulaA: 'p',
+        formulaB: '¬p',
+      },
+      {
+        id: 'comparar-subalternacao',
+        title: '(p∧q) vs (p∨q) (subalternação)',
+        mode: 'compare',
+        formulaA: '(p ∧ q)',
+        formulaB: '(p ∨ q)',
+      },
     ],
   },
   {

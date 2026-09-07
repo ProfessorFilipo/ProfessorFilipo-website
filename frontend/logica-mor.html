@@ -53,22 +53,34 @@
     <div class="lm-mode-row">
       <button type="button" class="lm-mode-btn" id="lm-mode-formula">FÓRMULA ÚNICA</button>
       <button type="button" class="lm-mode-btn" id="lm-mode-argument">ARGUMENTO (PREMISSAS ⊢ CONCLUSÃO)</button>
+      <button type="button" class="lm-mode-btn" id="lm-mode-compare">COMPARAR DUAS FÓRMULAS</button>
     </div>
 
     <div class="lm-premises" id="lm-premises"></div>
     <button type="button" class="lm-add-premise" id="lm-add-premise">+ ADICIONAR PREMISSA</button>
 
-    <div class="form-field" style="margin-bottom:6px;">
+    <div class="form-field" id="lm-main-field" style="margin-bottom:6px;">
       <label id="lm-main-label" for="lm-main-input">FÓRMULA</label>
       <input type="text" id="lm-main-input" class="lm-formula-input" placeholder="Ex.: ∀x(Aluno(x) → Estuda(x))" autocomplete="off" spellcheck="false">
     </div>
 
+    <div class="lm-compare-wrap" id="lm-compare-wrap" style="display:none;">
+      <div class="form-field" style="margin-bottom:6px;">
+        <label for="lm-compare-a">FÓRMULA A</label>
+        <input type="text" id="lm-compare-a" class="lm-formula-input" placeholder="Ex.: ∀x(Aluno(x) → Estuda(x))" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="form-field" style="margin-bottom:6px;">
+        <label for="lm-compare-b">FÓRMULA B</label>
+        <input type="text" id="lm-compare-b" class="lm-formula-input" placeholder="Ex.: ∃x(Aluno(x) ∧ ¬Estuda(x))" autocomplete="off" spellcheck="false">
+      </div>
+    </div>
+
     <div class="lm-keyboard" id="lm-keyboard"></div>
 
-    <p style="font-size:13px;color:var(--stone);margin:-10px 0 20px;">
+    <p style="font-size:13px;color:var(--stone);margin:-10px 0 20px;" id="lm-ascii-help">
       Notação ASCII também funciona: <code>!</code>/<code>~</code> = ¬, <code>&amp;</code> = ∧, <code>|</code> = ∨, <code>-&gt;</code> = →, <code>&lt;-&gt;</code> = ↔, <code>forall</code> = ∀, <code>exists</code> = ∃, <code>|-</code> = ⊢.
     </p>
-    <p style="font-size:13px;color:var(--stone);margin:-10px 0 20px;">
+    <p style="font-size:13px;color:var(--stone);margin:-10px 0 20px;" id="lm-sequent-help">
       Pode digitar um sequente inteiro de uma vez no campo abaixo, ex.: <code>p, q ⊢ p ∧ q</code> — a ferramenta separa as premissas da conclusão automaticamente.
     </p>
 
@@ -108,6 +120,12 @@
           <table class="lm-truth-table" id="lm-truth-table"></table>
         </div>
       </div>
+    </div>
+
+    <div class="lm-result" id="lm-compare-result" style="display:none;">
+      <div class="lm-verdict" id="lm-compare-verdict"></div>
+      <p class="lm-compare-caveat">Sem importação existencial (só domínio não-vazio) — contrariedade, subcontrariedade e subalternação dependem da classe do sujeito não ser vazia, o que nem sempre está garantido. Só a contraditoriedade vale de forma universal.</p>
+      <table class="lm-truth-table lm-compare-table" id="lm-compare-table"></table>
     </div>
 
   </main>
