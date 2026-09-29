@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Compare FIFO, LRU, OPT e Clock, passo a passo. Simulador didático de substituição de páginas — Prof. Filipo Novo Mór.">
+<meta name="theme-color" content="#10263C">
+<title>Substituição de páginas | Prof. Filipo Novo Mór</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%2310263c'/%3E%3Cpath d='M9 10h22v7H9zm0 13h22v7H9z' fill='%23d98a3d'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#10263c;--panel:#163654;--panel-alt:#1c3f60;--border:#2e5478;--text:#e7f0f8;--muted:#acc2d5;--accent:#d98a3d;--accent-hover:#ed9f51;--paper:#fff;--ink:#18334b;--grid:#c7d9ec;--hit:#126447;--hit-bg:#e3f4ec;--fault:#943d17;--fault-bg:#fff0df;--font:ui-monospace,"SFMono-Regular","JetBrains Mono","Fira Code",Menlo,Consolas,monospace;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}button,input,textarea,select{font:inherit}button,a,input,summary,select,textarea{-webkit-tap-highlight-color:transparent}button{border:1px solid var(--border);background:transparent;color:var(--text);padding:9px 13px;cursor:pointer;font-size:14px;transition:background .15s,border-color .15s;white-space:nowrap}button:hover:not(:disabled){border-color:var(--accent);background:var(--panel-alt)}button:disabled{opacity:.38;cursor:not-allowed}button.primary{background:var(--accent);color:#1a1206;border-color:var(--accent);font-weight:700}button.primary:hover:not(:disabled){background:var(--accent-hover)}:focus-visible{outline:3px solid var(--accent);outline-offset:3px}a{color:inherit}p{margin:0 0 12px}h1,h2,h3{margin:0;font-weight:650}h1{font-size:clamp(23px,2.2vw,32px);letter-spacing:-.8px}h2{font-size:16px}h3{font-size:15px}.app{max-width:1520px;margin:auto;padding:30px 28px 35px}header{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:25px}.eyebrow{color:var(--accent);font-size:12px;letter-spacing:1.5px;margin-bottom:7px}.subtitle{font-size:14px;color:var(--muted);margin:8px 0 0}.credit{text-decoration:none;color:var(--muted);font-size:13px;text-align:right}.credit span{font-size:12px}.panel{border:1px solid var(--border);background:var(--panel);padding:20px;margin-bottom:18px}.config{padding:0}.config summary{padding:15px 20px;cursor:pointer;font-size:14px;font-weight:600}.config summary span{float:right;color:var(--muted);font-weight:400}.config form{padding:0 20px 20px;border-top:1px solid var(--border)}.config-grid{display:grid;grid-template-columns:1.5fr .55fr 3fr;gap:16px;padding-top:18px}label{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--muted)}input,textarea,select{background:var(--panel-alt);color:var(--text);border:1px solid var(--border);padding:9px 10px;font-size:14px;min-width:0;max-width:100%;border-radius:0}textarea{resize:vertical;width:100%}.help{font-size:13px;color:var(--muted);line-height:1.6;margin:0}.config .help{margin:10px 0}.form-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px}#error{color:#ffbf9b;border-left:3px solid var(--accent);padding:8px 12px;margin-top:12px}.section-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.section-row>span{color:var(--muted);font-size:13px}.step-label{color:var(--accent)!important}.reference-strip{display:flex;gap:7px;overflow-x:auto;padding:3px 3px 12px;margin:-3px -3px 5px}.ref{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:47px;padding:5px 9px;line-height:1.3;background:var(--bg);flex-shrink:0}.ref .ref-index{font-size:11px;color:var(--muted);margin-top:5px}.ref .ref-page{font-size:19px;font-weight:650}.ref.past{background:var(--panel-alt)}.ref.current{border:2px solid var(--accent);background:var(--accent);color:#1a1206;padding:4px 8px}.ref.current .ref-index{color:#392715}.ref.future-opt{box-shadow:inset 0 -3px #91c9f4}.controls{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.buttons{display:flex;flex-wrap:wrap;gap:8px}.speed{flex-direction:row;align-items:center;font-size:13px}.speed select{padding:7px}.progress-track{height:3px;background:var(--border);margin:18px 0 12px}#progress{height:100%;background:var(--accent);transition:width .2s}.bottom-row{align-items:flex-start;margin:0}.bottom-row .help{max-width:760px}.legend{display:flex;gap:15px;white-space:nowrap;font-size:12px;margin:0}.hit-text{color:#a0e3bf}.fault-text{color:#ffc58f}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;align-items:start;margin-bottom:18px}.algorithm{background:var(--panel);border:1px solid var(--border);min-width:0}.card-head{padding:17px 17px 13px}.card-title{display:flex;justify-content:space-between;gap:8px;align-items:center}.card-title h2{font-size:22px;letter-spacing:.5px}.algo-subtitle{font-size:12px;color:var(--muted);margin:4px 0 0}.badge{font-size:11px;font-weight:700;letter-spacing:.3px;padding:4px 7px;border:1px solid var(--border)}.badge.hit{background:var(--hit-bg);color:var(--hit);border-color:#89c6ac}.badge.fault{background:var(--fault-bg);color:var(--fault);border-color:#dfae81}.memory{background:var(--paper);color:var(--ink);padding:15px 15px 12px;position:relative;border-block:1px solid var(--grid);color-scheme:light}.memory-label{font-size:11px;color:#50667a;text-transform:uppercase;letter-spacing:.8px;margin-bottom:9px}.frame{display:grid;grid-template-columns:42px 1fr 66px;align-items:center;gap:7px;margin-bottom:7px;min-height:41px}.frame-index{font-size:12px;color:#50667a}.slot{border:1px solid var(--grid);background:#f3f7fa;text-align:center;font-size:23px;font-weight:700;min-height:39px;position:relative;overflow:hidden;display:flex;justify-content:center;align-items:center}.slot.empty{color:#8ba0b3;font-weight:400}.slot.hit{background:var(--hit-bg);border-color:#6eae91;color:var(--hit)}.slot.fault{background:var(--fault-bg);border-color:#d78a45;color:var(--fault)}.frame-info{font-size:11px;color:#52697b;text-align:right;line-height:1.4}.frame-info strong{color:var(--ink);font-size:12px}.outgoing{font-size:13px;color:var(--fault);text-decoration:line-through;margin-right:10px;animation:leave .65s both}.incoming{display:inline-block;animation:arrive .45s both}.memory-foot{font-size:11px;color:#50667a;margin:7px 0 0}.internal{height:230px;padding:15px 17px;border-bottom:1px solid var(--border);overflow:auto}.internal h3{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:13px}.queue{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0}.queue span{border:1px solid var(--border);background:var(--bg);font-size:20px;min-width:39px;text-align:center;padding:5px}.queue span:first-child{border-color:var(--accent)}.direction{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;gap:10px}.state-list{list-style:none;margin:10px 0 0;padding:0;font-size:12px;color:var(--muted)}.state-list li{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #2e547850}.state-list b{color:var(--text)}.internal p{font-size:12px;color:var(--muted);line-height:1.6}.stats{display:grid;grid-template-columns:repeat(3,1fr);padding:13px 10px;text-align:center;border-bottom:1px solid var(--border)}.stat strong{display:block;font-size:23px}.stat span{font-size:11px;color:var(--muted)}.stat.faults strong{color:#ffc58f}.decision{padding:14px 17px 17px}.decision>p{font-size:13px;min-height:60px;line-height:1.6;margin-bottom:8px}.why summary{font-size:13px;color:var(--accent);cursor:pointer}.why-body{padding-top:12px;font-size:13px;color:var(--muted)}.why-body p{margin-bottom:9px}.why-body ol{padding-left:22px}.why-body li{margin-bottom:7px}.candidate{padding:5px 0;border-bottom:1px solid var(--border);font-size:12px}.clock-area{padding-top:9px;overflow:hidden}.clock-area h3{margin-bottom:0}.clock-svg{width:100%;height:164px;display:block}.clock-caption{font-size:11px!important;margin:0!important;line-height:1.3!important;text-align:center}.clock-svg text{font-family:var(--font)}.replay{margin-top:10px;font-size:12px;width:100%}.table-scroll{overflow:auto;max-height:440px}table{border-collapse:collapse;width:100%;font-size:13px;text-align:center}th,td{border:1px solid var(--border);padding:9px 10px}th{font-weight:600;color:var(--muted)}#timeline th:first-child{position:sticky;left:0;background:var(--panel);z-index:1;min-width:92px;text-align:left}#timeline th button{padding:4px;min-width:32px;border:0;font-size:14px}#timeline th small{display:block;font-size:10px;font-weight:400}#timeline td.hit{color:#a0e3bf;background:#174637}#timeline td.fault{color:#ffd2a5;background:#533c2b}#timeline .now{box-shadow:inset 0 0 0 2px var(--accent)}#timeline td{min-width:46px;cursor:pointer}.metrics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}.metric-row{display:flex;justify-content:space-between;gap:8px;font-size:13px;margin:8px 0;color:var(--muted)}.metric-row b{color:var(--text)}.metric-title{font-size:15px;display:flex;justify-content:space-between}.bar{height:8px;background:#315a79;margin:10px 0 14px}.bar span{display:block;height:100%;background:var(--accent)}.comparison .help{margin-top:18px}.guide summary{cursor:pointer;font-size:14px}.guide-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:20px}.guide h3{margin-bottom:8px}.guide p{font-size:13px;color:var(--muted);margin:0}.belady-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.belady-item{border-left:3px solid var(--accent);padding:8px 15px}.belady-item p{font-size:13px;color:var(--muted);margin:5px 0}.belady-result{color:#ffc58f;margin-top:15px;font-size:14px}.mini-frames{display:flex;gap:6px;margin-top:12px}.mini-frames span{border:1px solid var(--border);padding:5px 10px;min-width:34px;text-align:center}footer{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:16px;margin-top:30px}.skip{position:absolute;top:-100px;left:20px;padding:12px;background:var(--accent);color:#111;z-index:20}.skip:focus{top:10px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}[hidden]{display:none!important}@keyframes arrive{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}@keyframes leave{to{opacity:0;transform:translateY(-14px);width:0;margin:0}}@media(min-width:1650px){.app{padding-top:36px}.internal{height:240px}}@media(max-width:1150px){.app{padding:24px 20px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.config-grid{grid-template-columns:2fr 1fr}.sequence-field{grid-column:1/-1}.bottom-row{display:block}.legend{margin-top:10px}.metrics-grid{grid-template-columns:1fr 1fr}}@media(max-width:650px){.app{padding:20px 12px}header{align-items:flex-start;flex-direction:column;gap:12px}.credit{text-align:left;font-size:12px}.credit br{display:none}.credit span{margin-left:10px}.config summary span{float:none;display:block;font-size:12px;margin-top:6px}.panel{padding:15px}.config{padding:0}.cards{grid-template-columns:1fr}.card-head{padding:16px}.internal{height:auto;min-height:170px}.clock-area{height:230px}.section-row{align-items:flex-start}.section-row .help{display:none}.config-grid{grid-template-columns:1fr 90px}.config form{padding:0 14px 14px}.config summary{padding:14px}.guide-grid,.belady-grid{grid-template-columns:1fr}.metrics-grid{gap:20px 14px}.buttons{width:100%}.buttons button{flex:1}.speed{margin-top:5px}.legend{white-space:normal;flex-wrap:wrap}.guide p{font-size:14px}footer{flex-direction:column;gap:7px}.ref{min-width:43px}.decision>p{min-height:0}.metric-row{font-size:12px}.config-grid label{font-size:12px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.outgoing{display:none}}@media print{body{background:white;color:black}.config,.controls,.guide,footer{display:none}.app{padding:0}.panel,.algorithm{break-inside:avoid;color:black;background:white;border-color:#aaa}.cards{grid-template-columns:repeat(2,1fr)}.internal{height:auto;min-height:150px}.credit,.help,.subtitle,.algo-subtitle{color:#555}.metric-row,.stat span{color:#444}}
+
+
+.site-links{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:22px;font-size:13px;color:var(--muted)}.site-links a{text-underline-offset:4px}.site-links a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+<a class="skip" href="#controls">Ir para a simulação</a>
+<div class="app">
+<nav class="site-links" aria-label="Navegação do site"><a href="ferramentas.html">Ferramentas</a><span aria-hidden="true">/</span><a href="sistemas-operacionais.html">Sistemas Operacionais</a></nav>
+<header>
+  <div><p class="eyebrow">SISTEMAS OPERACIONAIS / PUCRS</p><h1>Substituição de páginas</h1><p class="subtitle">Uma sequência. Quatro estratégias. Compare cada decisão.</p></div>
+  <a class="credit" href="https://filipomor.com">Prof. Filipo Novo Mór<br><span>2026 · filipomor.com</span></a>
+</header>
+<main>
+  <details class="panel config" id="config">
+    <summary>Configuração da simulação <span id="config-summary">3 frames · 13 referências</span></summary>
+    <form id="config-form" novalidate>
+      <div class="config-grid">
+        <label>Cenário didático<select id="preset"><option value="basic">Comparação básica</option><option value="recency">FIFO × LRU</option><option value="optimal">Olhando o futuro com OPT</option><option value="clock">Segunda chance com Clock</option><option value="belady">Anomalia de Belady</option><option value="custom">Sequência personalizada</option></select></label>
+        <label>Frames (1–8)<input id="frames" type="number" min="1" max="8" value="3" required></label>
+        <label class="sequence-field">Sequência de referências<textarea id="sequence-input" rows="2" spellcheck="false" aria-describedby="input-help">7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2</textarea></label>
+      </div>
+      <p class="help" id="input-help">Páginas de 0 a 999 · até 100 acessos · separe por vírgula, espaço ou ponto e vírgula. Aplicar reinicia a memória vazia.</p>
+      <div class="form-actions"><button class="primary" type="submit">Aplicar e reiniciar</button><button type="button" id="default">Sequência padrão</button><button type="button" id="random">Gerar aleatória</button><span id="draft-note" class="help"></span></div>
+      <p id="error" role="alert" hidden></p>
+    </form>
+  </details>
+  <section class="panel execution" aria-label="Execução sincronizada">
+    <div class="section-row"><h2>Sequência de referências</h2><span id="step-label" class="step-label">Passo 0 / 13</span></div>
+    <div id="reference-strip" class="reference-strip" aria-label="Referências; selecione uma para navegar"></div>
+    <div id="controls" class="controls" tabindex="-1">
+      <div class="buttons"><button id="back" title="Seta para a esquerda">Anterior</button><button id="next" class="primary" title="Seta para a direita">Próximo</button><button id="play" title="Barra de espaço">▶ Executar</button><button id="finish">Ir ao final</button><button id="reset">Reiniciar</button></div>
+      <label class="speed">Velocidade <select id="speed"><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></label>
+    </div>
+    <div class="progress-track"><div id="progress"></div></div>
+    <div class="section-row bottom-row"><p id="scenario-note" class="help"></p><p class="legend"><span class="hit-text">H = hit</span><span class="fault-text">F = falta de página</span></p></div>
+  </section>
+  <p id="live-status" class="sr-only" role="status" aria-live="polite"></p>
+  <section id="cards" class="cards" aria-label="Comparação dos quatro algoritmos"></section>
+  <section class="panel belady" id="belady" hidden aria-labelledby="belady-title"><div class="section-row"><h2 id="belady-title">Experimento de Belady / FIFO</h2><span>Mesmo passo, mesma sequência</span></div><div id="belady-content"></div></section>
+  <section class="panel history" aria-labelledby="history-title">
+    <div class="section-row"><h2 id="history-title">Linha do tempo</h2><p class="help">Clique em uma coluna para rever o estado.</p></div>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Tabela comparativa de hits e faltas"><table id="timeline"></table></div>
+  </section>
+  <section class="panel comparison" aria-labelledby="comparison-title"><div class="section-row"><h2 id="comparison-title">Resultados até este passo</h2><span id="results-step"></span></div><div id="metrics"></div><p id="conclusion" class="help"></p></section>
+  <details class="panel guide"><summary>Como interpretar a simulação</summary><div class="guide-grid"><div><h3>Hit, falta e substituição</h3><p><b>Hit:</b> a página já está na memória. <b>Falta de página:</b> é preciso carregá-la. <b>Substituição:</b> uma falta com a memória cheia exige remover outra página. Portanto, nem toda falta é uma substituição.</p></div><div><h3>Quatro regras, o mesmo problema</h3><p><b>FIFO:</b> remove a página que entrou primeiro. <b>LRU:</b> remove a que está há mais tempo sem uso. <b>OPT:</b> remove a que terá o uso mais distante no futuro; serve de limite teórico. <b>Clock:</b> usa bits de referência para dar uma segunda chance.</p></div><div><h3>Convenções do Clock</h3><p>O ponteiro começa no frame 0 e indica o próximo candidato. Carga e hit colocam R=1. Em uma falta, R=1 é limpo e a busca avança; um frame livre ou R=0 é escolhido. Após a carga, o ponteiro avança. Hits não movem o ponteiro.</p></div><div><h3>Atalhos e hipóteses</h3><p>Use ← e → para navegar; espaço executa ou pausa, fora dos campos de edição. A memória começa vazia, com frames locais de um único processo. Não modelamos escrita em disco, bits de modificação ou tempo de E/S. Em empates do OPT, vence o menor índice de frame.</p></div></div></details>
+</main>
+<footer><span>Prof. Filipo Novo Mór · Sistemas Operacionais · 2026</span><span>FIFO / LRU / OPT / CLOCK</span></footer>
+</div>
+<noscript>Ative o JavaScript do navegador para executar a simulação.</noscript>
+<script>
+(()=>{
+'use strict';
+/** Estado puro: o motor não conhece o DOM. Frames têm posições físicas estáveis. */
+class BaseAlgorithm {
+  constructor(size) { this.size = size; this.reset(); }
+  reset() {
+    this.frames = Array(this.size).fill(null);
+    this.hits = 0; this.faults = 0; this.replacements = 0;
+    this.event = null; this.last = Array(this.size).fill(null);
+    this.loaded = Array(this.size).fill(null);
+  }
+  getState() {
+    return { frames: [...this.frames], hits: this.hits, faults: this.faults,
+      replacements: this.replacements, last: [...this.last], loaded: [...this.loaded],
+      event: this.event ? structuredClone(this.event) : null };
+  }
+  begin(page, index) {
+    const frame = this.frames.indexOf(page);
+    this.event = { page, step: index + 1, hit: frame !== -1, frame, victim: null, reasons: [], candidates: [], trace: [] };
+    if (frame !== -1) { this.hits++; this.last[frame] = index + 1; }
+    else this.faults++;
+    return frame;
+  }
+  put(frame, page, index) {
+    const victim = this.frames[frame];
+    if (victim !== null) this.replacements++;
+    Object.assign(this.event, { frame, victim });
+    this.frames[frame] = page;
+    this.last[frame] = this.loaded[frame] = index + 1;
+  }
+  emptyReason(frame) { return `O frame ${frame} está livre. A página é carregada sem remover outra página.`; }
+}
+
+class FIFO extends BaseAlgorithm {
+  step(page, { index }) {
+    if (this.begin(page, index) !== -1) {
+      this.event.reasons.push(`A página ${page} já está na memória. O hit não altera a ordem de entrada do FIFO.`);
+      return;
+    }
+    let frame = this.frames.indexOf(null);
+    if (frame === -1) {
+      this.event.candidates = this.frames.map((p, f) => ({ page: p, frame: f, value: this.loaded[f] }));
+      frame = this.loaded.indexOf(Math.min(...this.loaded));
+      this.event.reasons.push(`A página ${this.frames[frame]} entrou no passo ${this.loaded[frame]}: é a residente mais antiga. Acessos posteriores não mudam sua posição na fila.`);
+    } else this.event.reasons.push(this.emptyReason(frame));
+    this.put(frame, page, index);
+  }
+}
+
+class LRU extends BaseAlgorithm {
+  step(page, { index }) {
+    if (this.begin(page, index) !== -1) {
+      this.event.reasons.push(`A página ${page} já está na memória e passa a ser a mais recentemente utilizada.`);
+      return;
+    }
+    let frame = this.frames.indexOf(null);
+    if (frame === -1) {
+      this.event.candidates = this.frames.map((p, f) => ({ page: p, frame: f, value: this.last[f] }));
+      frame = this.last.indexOf(Math.min(...this.last));
+      this.event.reasons.push(`A página ${this.frames[frame]} teve seu último acesso no passo ${this.last[frame]}, o mais distante no passado entre as páginas residentes.`);
+    } else this.event.reasons.push(this.emptyReason(frame));
+    this.put(frame, page, index);
+  }
+}
+
+function nextUse(sequence, index, page) {
+  const next = sequence.indexOf(page, index + 1);
+  return next === -1 ? Infinity : next + 1;
+}
+class OPT extends BaseAlgorithm {
+  step(page, { index, sequence }) {
+    if (this.begin(page, index) !== -1) {
+      this.event.reasons.push(`A página ${page} já está na memória. Nenhuma substituição é necessária.`);
+      return;
+    }
+    let frame = this.frames.indexOf(null);
+    if (frame === -1) {
+      const uses = this.frames.map(p => nextUse(sequence, index, p));
+      this.event.candidates = this.frames.map((p, f) => ({ page: p, frame: f, value: uses[f] }));
+      frame = uses.indexOf(Math.max(...uses));
+      this.event.reasons.push(uses[frame] === Infinity
+        ? `A página ${this.frames[frame]} não será acessada novamente nesta sequência.`
+        : `O próximo acesso à página ${this.frames[frame]} ocorre no passo ${uses[frame]}, o mais distante no futuro.`);
+      if (uses.filter(n => n === uses[frame]).length > 1)
+        this.event.reasons.push('Há empate. Escolhemos o menor índice de frame; qualquer uma das páginas empatadas mantém a quantidade ótima de faltas.');
+    } else this.event.reasons.push(this.emptyReason(frame));
+    this.put(frame, page, index);
+  }
+}
+
+class Clock extends BaseAlgorithm {
+  reset() { super.reset(); this.hand = 0; this.bits = Array(this.size).fill(0); }
+  getState() { return { ...super.getState(), hand: this.hand, bits: [...this.bits] }; }
+  trace(text, action) { this.event.trace.push({ text, action, hand: this.hand, frames: [...this.frames], bits: [...this.bits] }); }
+  step(page, { index }) {
+    const found = this.begin(page, index);
+    if (found !== -1) {
+      this.bits[found] = 1;
+      this.event.reasons.push(`Hit no frame ${found}: R recebe 1. O ponteiro permanece no frame ${this.hand}.`);
+      return;
+    }
+    this.trace(`Começa a busca no frame ${this.hand}.`, 'start');
+    while (this.frames[this.hand] !== null && this.bits[this.hand] === 1) {
+      const f = this.hand;
+      this.bits[f] = 0;
+      this.trace(`Frame ${f}, página ${this.frames[f]}: R era 1. Recebe segunda chance; R ← 0.`, 'clear');
+      this.hand = (this.hand + 1) % this.size;
+      this.trace(`Avança para o frame ${this.hand}.`, 'advance');
+    }
+    const frame = this.hand;
+    this.event.reasons.push(this.frames[frame] === null ? this.emptyReason(frame)
+      : `Após a varredura, o frame ${frame} tem R=0. A página ${this.frames[frame]} é substituída por ${page}.`);
+    this.put(frame, page, index);
+    this.bits[frame] = 1;
+    this.trace(`Carrega ${page} no frame ${frame}, com R=1.`, 'insert');
+    this.hand = (frame + 1) % this.size;
+    this.trace(`Ponteiro pronto para a próxima falta: frame ${this.hand}.`, 'finish');
+    this.event.reasons.push(`A nova página recebe R=1 e o ponteiro avança para o frame ${this.hand}. Hits não movem o ponteiro.`);
+  }
+}
+
+const ALGORITHMS = { FIFO, LRU, OPT, Clock };
+const PRESETS = {
+  basic: { title: 'Comparação básica', frames: 3, sequence: [7,0,1,2,0,3,0,4,2,3,0,3,2], note: 'Comece com a memória vazia. Observe o passo 7: os algoritmos já tomam decisões diferentes.' },
+  recency: { title: 'FIFO × LRU', frames: 3, sequence: [1,2,3,1,4,1,2,5,1,2,3,4,5], note: 'A página 1 é reutilizada antes da chegada da página 4. Um hit muda a prioridade do LRU, mas não a do FIFO.' },
+  optimal: { title: 'Olhando o futuro com OPT', frames: 3, sequence: [1,2,3,4,1,2,5,1,2,3,4,5], note: 'Compare o passado usado pelo LRU com os próximos acessos usados pelo OPT. OPT é uma referência teórica: exige conhecer o futuro.' },
+  clock: { title: 'Segunda chance com Clock', frames: 3, sequence: [1,2,3,4,2,5,2,4,1,5,2], note: 'No passo 4, os três bits R são limpos. No passo 6, a página 2 recebe segunda chance após o hit do passo 5.' },
+  belady: { title: 'Anomalia de Belady', frames: 3, sequence: [1,2,3,4,1,2,5,1,2,3,4,5], note: 'A comparação extra mostra FIFO com 3 e 4 frames no mesmo passo. Ao final: 9 faltas com 3 frames e 10 com 4.' }
+};
+function validate(sequenceText, frameText) {
+  const size = Number(frameText);
+  if (!Number.isInteger(size) || size < 1 || size > 8) throw new Error('Use entre 1 e 8 frames.');
+  const text = sequenceText.trim();
+  if (!text) throw new Error('Informe ao menos uma referência de página.');
+  if (!/^\d+(?:[\s,;]+\d+)*$/.test(text)) throw new Error('Use números inteiros de 0 a 999, separados por vírgula, espaço ou ponto e vírgula.');
+  const sequence = text.split(/[\s,;]+/).map(Number);
+  if (sequence.length > 100) throw new Error('Use no máximo 100 referências para manter a visualização legível.');
+  if (sequence.some(p => !Number.isInteger(p) || p < 0 || p > 999)) throw new Error('Cada página deve ser um inteiro de 0 a 999.');
+  return { sequence, size };
+}
+function simulate(sequence, size) {
+  const machines = Object.fromEntries(Object.entries(ALGORITHMS).map(([name, Class]) => [name, new Class(size)]));
+  const capture = () => Object.fromEntries(Object.entries(machines).map(([name, machine]) => [name, machine.getState()]));
+  const snapshots = [capture()];
+  sequence.forEach((page, index) => {
+    Object.values(machines).forEach(machine => machine.step(page, { index, sequence }));
+    snapshots.push(capture());
+  });
+  return snapshots;
+}
+
+const TITLES = { FIFO: 'First In, First Out', LRU: 'Least Recently Used', OPT: 'Substituição ótima', Clock: 'Relógio / segunda chance' };
+const pct = n => n.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '%';
+const futureText = n => n === Infinity ? 'sem novo acesso' : `passo ${n}`;
+function clockSVG(state) {
+  const n = state.frames.length, radius = n > 5 ? 92 : 62;
+  const cx = 130, cy = n > 5 ? 120 : 90, viewHeight = n > 5 ? 240 : 185;
+  const nodes = state.frames.map((page, i) => {
+    const a = -Math.PI / 2 + 2 * Math.PI * i / n;
+    const x = cx + Math.cos(a)*radius, y = cy + Math.sin(a)*radius;
+    return `<g><rect x="${x-26}" y="${y-22}" width="52" height="44" fill="${i===state.hand?'#d98a3d':'#10263c'}" stroke="${i===state.hand?'#efb378':'#668cae'}"/><text x="${x}" y="${y-7}" fill="${i===state.hand?'#35200c':'#acc2d5'}" font-size="10" text-anchor="middle">F${i} · R${state.bits[i]}</text><text x="${x}" y="${y+13}" fill="${i===state.hand?'#1a1206':'#e7f0f8'}" font-size="18" font-weight="600" text-anchor="middle">${page??'–'}</text></g>`;
+  }).join('');
+  const angle = -Math.PI/2 + 2*Math.PI*state.hand/n;
+  const endX = cx + Math.cos(angle)*(radius-30), endY = cy + Math.sin(angle)*(radius-30);
+  return `<svg class="clock-svg" viewBox="0 0 260 ${viewHeight}" role="img" aria-label="Clock: ponteiro no frame ${state.hand}. ${state.frames.map((p,i)=>`Frame ${i}: página ${p??'vazia'}, bit R ${state.bits[i]}`).join('. ')}"><circle cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="#476c8d" stroke-dasharray="3 5"/><line x1="${cx}" y1="${cy}" x2="${endX}" y2="${endY}" stroke="#d98a3d" stroke-width="3"/><circle cx="${endX}" cy="${endY}" r="4" fill="#d98a3d"/><circle cx="${cx}" cy="${cy}" r="5" fill="#d98a3d"/>${nodes}</svg>`;
+}
+function internalHTML(name, state, sequence, cursor) {
+  const resident = state.frames.map((page, frame) => ({ page, frame, loaded: state.loaded[frame], last: state.last[frame] })).filter(r=>r.page!==null);
+  if (name === 'Clock') return `<div class="internal clock-area"><h3>Ponteiro e bits de referência</h3><div id="clock-drawing">${clockSVG(state)}</div><p id="clock-caption" class="clock-caption">Próximo candidato: frame ${state.hand} · sentido horário</p></div>`;
+  if (name === 'OPT') return `<div class="internal"><h3>Próximos acessos / após este passo</h3>${resident.length ? `<ul class="state-list">${resident.map(r=>`<li><b>Página ${r.page}</b><span>${futureText(nextUse(sequence,cursor-1,r.page))}</span></li>`).join('')}</ul>` : '<p>Os próximos acessos aparecerão quando houver páginas na memória.</p>'}<p style="margin-top:12px">Conhecer o futuro permite minimizar as faltas para esta sequência.</p></div>`;
+  const fifo = name === 'FIFO', sorted = resident.sort((a,b)=>fifo?a.loaded-b.loaded:a.last-b.last);
+  return `<div class="internal"><h3>${fifo?'Fila de entrada':'Ordem de recência'}</h3><div class="direction"><span>${fifo?'mais antiga':'menos recente'}</span><span>${fifo?'mais nova':'mais recente'}</span></div><div class="queue">${sorted.map(r=>`<span>${r.page}</span>`).join('')||'<p>Memória vazia</p>'}</div><ul class="state-list">${sorted.map(r=>`<li><b>Página ${r.page}</b><span>${fifo?'entrada':'uso'}: passo ${fifo?r.loaded:r.last}</span></li>`).join('')}</ul></div>`;
+}
+function cardHTML(name, state, sequence, cursor, open, animate) {
+  const e = state.event;
+  const outcome = e ? (e.hit?'hit':'fault') : '';
+  const short = !e ? 'Memória vazia. Avance para processar a primeira referência.' : e.hit ? `Página ${e.page} encontrada no frame ${e.frame}.` : e.victim===null ? `Página ${e.page} carregada no frame ${e.frame}, que estava livre.` : `Página ${e.victim} sai; página ${e.page} entra no frame ${e.frame}.`;
+  return `<article class="algorithm" id="card-${name}" aria-label="Algoritmo ${name}"><div class="card-head"><div class="card-title"><h2>${name}</h2><span class="badge ${outcome}">${e?(e.hit?'HIT':'PAGE FAULT'):'PRONTO'}</span></div><p class="algo-subtitle">${TITLES[name]}</p></div><div class="memory"><div class="memory-label">Memória física / ${state.frames.length} frames</div>${state.frames.map((p,f)=>`<div class="frame"><span class="frame-index">F${f}</span><div class="slot ${p===null?'empty':''} ${e&&e.frame===f?outcome:''}">${animate&&e&&e.frame===f&&e.victim!==null?`<span class="outgoing" aria-hidden="true">${e.victim}</span>`:''}<span class="${animate&&e&&e.frame===f?'incoming':''}">${p??'–'}</span></div><span class="frame-info">${p===null?'livre':name==='Clock'?`bit <strong>R=${state.bits[f]}</strong>`:name==='OPT'?`próx.<br><strong>${nextUse(sequence,cursor-1,p)===Infinity?'∞':'#'+nextUse(sequence,cursor-1,p)}</strong>`:`${name==='FIFO'?'entrada':'uso'}<br><strong>#${name==='FIFO'?state.loaded[f]:state.last[f]}</strong>`}</span></div>`).join('')}<p class="memory-foot">${name==='OPT'?'∞ = sem novo acesso na sequência':'F = índice do frame físico'}</p></div>${internalHTML(name,state,sequence,cursor)}<div class="stats"><div class="stat faults"><strong>${state.faults}</strong><span>faltas</span></div><div class="stat"><strong>${state.hits}</strong><span>hits</span></div><div class="stat"><strong>${state.replacements}</strong><span>trocas</span></div></div><div class="decision"><p>${short}</p><details class="why" data-algorithm="${name}" ${open?'open':''}><summary>Por quê?</summary><div class="why-body">${e?e.reasons.map(r=>`<p>${r}</p>`).join(''):'<p>A primeira referência causará uma falta compulsória: nenhuma página está carregada.</p>'}${e?.candidates.length?`<p><b>Candidatos antes da substituição:</b></p>${e.candidates.map(c=>`<div class="candidate">F${c.frame} · página ${c.page}: ${name==='FIFO'?'entrada no passo '+c.value:name==='LRU'?'último uso no passo '+c.value:futureText(c.value)}</div>`).join('')}`:''}${name==='Clock'&&e?.trace.length?`<ol>${e.trace.map(t=>`<li>${t.text}</li>`).join('')}</ol><button type="button" id="replay-clock" class="replay">Rever varredura do Clock</button>`:''}</div></details></div></article>`;
+}
+function renderTimeline(sequence, history, cursor) {
+  return `<caption class="sr-only">H significa hit, F significa falta de página; traço significa acesso ainda não processado.</caption><thead><tr><th scope="col">Página<small>passo</small></th>${sequence.map((p,i)=>`<th scope="col" class="${cursor===i+1?'now':''}"><button data-step="${i+1}" aria-label="Ir ao passo ${i+1}, página ${p}">${p}<small>${i+1}</small></button></th>`).join('')}</tr></thead><tbody>${Object.keys(history[0]).map(name=>`<tr><th scope="row">${name}</th>${sequence.map((p,i)=>{const e=history[i+1][name].event, visited=i<cursor;return `<td data-step="${i+1}" class="${visited?(e.hit?'hit':'fault'):''} ${cursor===i+1?'now':''}" title="${name}, passo ${i+1}${visited?`: ${e.hit?'hit':'falta'}`:': ainda não processado'}">${visited?(e.hit?'H':'F'):'·'}</td>`;}).join('')}</tr>`).join('')}</tbody>`;
+}
+function renderMetrics(states, cursor) {
+  return `<div class="metrics-grid">${Object.entries(states).map(([name,s])=>`<div><div class="metric-title"><b>${name}</b><span>${s.faults} F</span></div><div class="bar" role="img" aria-label="Taxa de faltas: ${pct(cursor?s.faults/cursor*100:0)}"><span style="width:${cursor?s.faults/cursor*100:0}%"></span></div><div class="metric-row"><span>Referências</span><b>${cursor}</b></div><div class="metric-row"><span>Taxa de hits</span><b>${pct(cursor?s.hits/cursor*100:0)}</b></div><div class="metric-row"><span>Taxa de faltas</span><b>${pct(cursor?s.faults/cursor*100:0)}</b></div><div class="metric-row"><span>Substituições</span><b>${s.replacements}</b></div></div>`).join('')}</div>`;
+}
+
+const $ = id => document.getElementById(id);
+let sequence = [...PRESETS.basic.sequence], size = 3, scenario = 'basic';
+let history = simulate(sequence, size), cursor = 0, timer = null, playing = false;
+let clockTimers = [], runToken = 0, belady3 = null, belady4 = null;
+const openDetails = new Set();
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+function stopClock() { clockTimers.forEach(clearTimeout); clockTimers = []; runToken++; }
+function stop() { clearTimeout(timer); timer = null; playing = false; $('play').textContent = '▶ Executar'; }
+function clockAnimation() {
+  stopClock();
+  const state = history[cursor].Clock, trace = state.event?.trace;
+  if (!trace?.length || reducedMotion.matches) return 0;
+  const token = runToken, interval = 250 / Number($('speed').value);
+  trace.forEach((t,i) => clockTimers.push(setTimeout(()=> {
+    if (token!==runToken) return;
+    $('clock-drawing').innerHTML = clockSVG(t);
+    $('clock-caption').textContent = 'Varredura: '+t.text;
+  },i*interval)));
+  clockTimers.push(setTimeout(()=> {
+    if (token!==runToken) return;
+    $('clock-drawing').innerHTML=clockSVG(state);
+    $('clock-caption').textContent=`Próximo candidato: frame ${state.hand} · sentido horário`;
+  },trace.length*interval));
+  return trace.length*interval;
+}
+function render(animate=false) {
+  stopClock();
+  const states = history[cursor];
+  $('step-label').textContent = `Passo ${cursor} / ${sequence.length}${cursor?' · página '+sequence[cursor-1]:''}`;
+  $('config-summary').textContent = `${size} ${size===1?'frame':'frames'} · ${sequence.length} ${sequence.length===1?'referência':'referências'}`;
+  const candidates = states.OPT.event?.candidates || [];
+  $('reference-strip').innerHTML = sequence.map((p,i)=>`<button class="ref ${i+1===cursor?'current':i<cursor?'past':''} ${candidates.some(c=>c.value===i+1)&&i>=cursor?'future-opt':''}" data-step="${i+1}" aria-label="Passo ${i+1}, página ${p}" ${i+1===cursor?'aria-current="step"':''}><span class="ref-page">${p}</span><span class="ref-index">${i+1}</span></button>`).join('');
+  const current=$('reference-strip').querySelector('.current');
+  if(current){ const strip=$('reference-strip'); if(current.offsetLeft-strip.offsetLeft<strip.scrollLeft || current.offsetLeft-strip.offsetLeft+current.offsetWidth>strip.scrollLeft+strip.clientWidth) strip.scrollLeft=current.offsetLeft-strip.offsetLeft-strip.clientWidth/2; }
+  $('back').disabled=cursor===0;
+  $('next').disabled=$('finish').disabled=cursor===sequence.length;
+  $('play').disabled=cursor===sequence.length;
+  $('play').textContent=playing?'⏸ Pausar':'▶ Executar';
+  $('reset').disabled=cursor===0&&!playing;
+  $('progress').style.width=`${cursor/sequence.length*100}%`;
+  $('cards').innerHTML=Object.entries(states).map(([name,s])=>cardHTML(name,s,sequence,cursor,openDetails.has(name),animate)).join('');
+  $('timeline').innerHTML=renderTimeline(sequence,history,cursor);
+  $('metrics').innerHTML=renderMetrics(states,cursor);
+  $('results-step').textContent=`${cursor} de ${sequence.length} acessos`;
+  $('scenario-note').textContent=PRESETS[scenario]?.note||'Compare as decisões para sua sequência personalizada. Todos os algoritmos recebem a mesma referência.';
+  $('conclusion').textContent=cursor===sequence.length?`Sequência concluída com ${size} ${size===1?'frame':'frames'}. Faltas: FIFO ${states.FIFO.faults}, LRU ${states.LRU.faults}, OPT ${states.OPT.faults} e Clock ${states.Clock.faults}. Este resultado vale para esta sequência e configuração.`:'As barras mostram a proporção de faltas entre os acessos já processados. OPT conhece a sequência futura completa.';
+  $('belady').hidden=scenario!=='belady';
+  if(scenario==='belady') renderBelady();
+  $('live-status').textContent=cursor?`Passo ${cursor}, página ${sequence[cursor-1]}. ${Object.entries(states).map(([n,s])=>`${n}: ${s.event.hit?'hit':'falta'}`).join('. ')}.`:'Simulação reiniciada. Memória vazia.';
+  return animate?clockAnimation():0;
+}
+function renderBelady() {
+  const a=belady3[cursor].FIFO,b=belady4[cursor].FIFO;
+  $('belady-content').innerHTML=`<div class="belady-grid">${[[3,a],[4,b]].map(([n,s])=>`<div class="belady-item"><h3>${n} frames · ${s.faults} faltas</h3><p>${s.hits} hits · ${s.replacements} substituições</p><div class="mini-frames">${s.frames.map((p,i)=>`<span title="Frame ${i}">${p??'–'}</span>`).join('')}</div></div>`).join('')}</div><p class="belady-result">${cursor===sequence.length?`Mais memória, mais faltas: ${a.faults} → ${b.faults}. FIFO pode apresentar a anomalia de Belady.`:`Observe a contagem até o passo ${cursor}; a conclusão usa a sequência inteira.`}</p>`;
+}
+function go(step, animate=false) {
+  stop(); cursor=Math.max(0,Math.min(sequence.length,step)); render(animate);
+}
+function tick() {
+  if(!playing) return;
+  if(cursor>=sequence.length){stop();render();return;}
+  cursor++;
+  if(cursor===sequence.length) stop();
+  const animationTime=render(true);
+  if(playing) timer=setTimeout(tick, Math.max(900/Number($('speed').value),animationTime+500/Number($('speed').value)));
+}
+function togglePlay() {
+  if(playing){stop();stopClock();render();return;}
+  if(cursor>=sequence.length)return;
+  playing=true;tick();
+}
+function draft(preset) {
+  if(PRESETS[preset]) {
+    $('frames').value=PRESETS[preset].frames;
+    $('sequence-input').value=PRESETS[preset].sequence.join(', ');
+  }
+  $('draft-note').textContent='Clique em Aplicar para usar esta configuração.';
+  $('error').hidden=true;
+}
+$('config-form').addEventListener('submit',e=>{
+  e.preventDefault();
+  try {
+    const validated=validate($('sequence-input').value,$('frames').value);
+    stop();stopClock(); sequence=validated.sequence;size=validated.size;scenario=$('preset').value;
+    // Evita rótulos de cenários inconsistentes com dados editados ou manipulados.
+    const preset=PRESETS[scenario];
+    if(preset && (size!==preset.frames||sequence.join(',')!==preset.sequence.join(','))) scenario='custom';
+    $('preset').value=scenario;history=simulate(sequence,size);cursor=0;
+    if(scenario==='belady'){belady3=simulate(sequence,3);belady4=simulate(sequence,4);}
+    $('error').hidden=true;$('draft-note').textContent='';$('config').open=false;render();$('next').focus();
+  } catch(error){$('error').textContent=error.message;$('error').hidden=false;}
+});
+$('preset').addEventListener('change',()=>draft($('preset').value));
+for(const id of ['frames','sequence-input']) $(id).addEventListener('input',()=>{$('preset').value='custom';draft('custom');});
+$('default').addEventListener('click',()=>{$('preset').value='basic';draft('basic');});
+$('random').addEventListener('click',()=>{
+  $('preset').value='custom';$('sequence-input').value=Array.from({length:20},()=>Math.floor(Math.random()*8)).join(', ');draft('custom');
+});
+$('back').addEventListener('click',()=>go(cursor-1));
+$('next').addEventListener('click',()=>go(cursor+1,true));
+$('reset').addEventListener('click',()=>go(0));
+$('finish').addEventListener('click',()=>go(sequence.length));
+$('play').addEventListener('click',togglePlay);
+$('speed').addEventListener('change',()=>{if(playing){clearTimeout(timer);timer=setTimeout(tick,900/Number($('speed').value));}});
+for(const id of ['reference-strip','timeline']) $(id).addEventListener('click',e=>{const t=e.target.closest('[data-step]');if(t)go(Number(t.dataset.step));});
+$('cards').addEventListener('toggle',e=>{if(e.target.matches('.why')){const name=e.target.dataset.algorithm;if(e.target.open)openDetails.add(name);else openDetails.delete(name);}},true);
+$('cards').addEventListener('click',e=>{if(e.target.id==='replay-clock'){stop();clockAnimation();}});
+document.addEventListener('keydown',e=>{
+  if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||e.target.closest('input,textarea,select,[contenteditable="true"]'))return;
+  if(e.key==='ArrowRight'){e.preventDefault();go(cursor+1,true);}
+  else if(e.key==='ArrowLeft'){e.preventDefault();go(cursor-1);}
+  else if(e.code==='Space'&&!e.target.closest('button,summary,a')){e.preventDefault();togglePlay();}
+});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&playing){stop();render();}});
+render();
+
+})();
+</script>
+</body>
+</html>
