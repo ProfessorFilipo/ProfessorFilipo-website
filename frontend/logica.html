@@ -8,10 +8,11 @@
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
 <title>Lógica para Computação — Filipo Novo Mór</title>
-<meta name="description" content="Materiais de Lógica para Computação — PUCRS. Provas, listas de exercícios de Prolog e árvores de refutação por semestre.">
+<meta name="description" content="Materiais de Lógica para Computação — PUCRS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/main.css?v=7">
+<link rel="stylesheet" href="css/teaching.css?v=1">
 </head>
 <body>
 
@@ -26,9 +27,7 @@
     </nav>
     <div style="display:flex;align-items:center;gap:16px;">
       <div class="lang-switch">
-        <span class="current">PT-BR</span>
-        <span class="sep">/</span>
-        <a href="#" title="Versão em inglês em breve">EN-CA</a>
+        <span class="current">PT-BR</span><span class="sep">/</span><a href="#" title="Versão em inglês em breve">EN-CA</a>
       </div>
       <a href="index.html" class="site-logo" aria-label="Filipo Novo Mór — página inicial">
         <img src="assets/logo-photo.jpg" alt="Foto de Filipo com seu gato, o Alemão">
@@ -40,64 +39,25 @@
     <p class="breadcrumb"><a href="index.html">INÍCIO</a><span class="sep">/</span><a href="ensino.html">ENSINO</a><span class="sep">/</span><a href="ensino-disciplinas.html">DISCIPLINAS</a><span class="sep">/</span>LÓGICA PARA COMPUTAÇÃO</p>
     <p class="eyebrow">PUCRS</p>
     <h1>Lógica para Computação</h1>
-    <p>Lógica proposicional e de predicados aplicada à computação — Prolog, árvores de refutação e resolução.</p>
+    <p>Lógica proposicional e de predicados aplicada à computação — linguagem formal, dedução natural, tabelas-verdade e circuitos.</p>
   </div>
 
-  <main class="content">
-
-    <div class="official-link-row">
-      <a class="btn primary" href="https://moodle.pucrs.br/course/view.php?id=96837" target="_blank" rel="noopener">ACESSO OFICIAL — MOODLE ↗</a>
+  <main class="content teaching-content">
+    <div class="official-link-row"><a class="btn primary" href="https://moodle.pucrs.br/course/view.php?id=96837" target="_blank" rel="noopener">ACESSO OFICIAL — MOODLE ↗</a></div>
+    
+    <div class="teaching-intro">
+      <h2>MATERIAIS DA DISCIPLINA</h2>
+      <p>Conteúdo organizado por semestre e por tipo de recurso. Materiais permanentes permanecem disponíveis independentemente da turma em andamento.</p>
     </div>
-
-    <!--
-      MODELO DE CONTEUDO: cada disciplina segue este padrao.
-      Para adicionar um novo semestre: (1) adicione um botao <button class="semester-tab">
-      com um data-target unico, (2) adicione um <div class="semester-panel"> correspondente
-      com o mesmo id. O primeiro semestre da lista fica "active" por padrao.
-      Troque os links de arquivo de exemplo (#) pelos arquivos reais em assets/materiais/logica/.
-    -->
-    <div class="semester-tabs">
-      <button class="semester-tab active" data-target="sem-2026-1">2026/I</button>
-      <button class="semester-tab" data-target="sem-2025-2">2025/II</button>
-      <button class="semester-tab" data-target="sem-2025-1">2025/I</button>
-      <button class="semester-tab" data-target="sem-2024-2">2024/II</button>
-    </div>
-
-    <div class="semester-panel active" id="sem-2026-1">
-      <ul class="material-list">
-        <li>Prova 1 <a class="file-link" href="#">PDF ↓</a></li>
-        <li>Lista de exercícios — Prolog <a class="file-link" href="#">PDF ↓</a></li>
-        <li>Gabarito comentado — árvores de refutação <a class="file-link" href="#">PDF ↓</a></li>
-      </ul>
-    </div>
-
-    <div class="semester-panel" id="sem-2025-2">
-      <ul class="material-list">
-        <li>Prova 1 <a class="file-link" href="#">PDF ↓</a></li>
-        <li>Prova 2 <a class="file-link" href="#">PDF ↓</a></li>
-      </ul>
-    </div>
-
-    <div class="semester-panel" id="sem-2025-1">
-      <ul class="material-list">
-        <li>Prova 1 <a class="file-link" href="#">PDF ↓</a></li>
-        <li>Prova 2 <a class="file-link" href="#">PDF ↓</a></li>
-      </ul>
-    </div>
-
-    <div class="semester-panel" id="sem-2024-2">
-      <ul class="material-list">
-        <li>Prova 1 <a class="file-link" href="#">PDF ↓</a></li>
-      </ul>
-    </div>
-
+    <section data-materials-root data-discipline="logica" aria-live="polite">
+      <div class="material-empty">Carregando catálogo de materiais…</div>
+    </section>
   </main>
 
   <footer class="api-status">
     <span id="api-status-text">Verificando conexão com a API…</span>
   </footer>
-
   <script src="js/api.js"></script>
-  <script src="js/semester-tabs.js"></script>
+  <script src="js/materials.js?v=1"></script>
 </body>
 </html>

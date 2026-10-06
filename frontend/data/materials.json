@@ -1,0 +1,262 @@
+{
+  "schema_version": 1,
+  "updated": "2026-10-06",
+  "disciplines": {
+    "logica": {
+      "name": "Lógica para Computação",
+      "institution": "PUCRS",
+      "permanent_resources": [
+        {
+          "id": "logica-tabela-regras-deducao-natural",
+          "type": "referencia",
+          "title": "Tabela de Regras de Dedução Natural",
+          "description": "Folha de referência rápida com as principais regras de dedução natural da lógica proposicional.",
+          "pages": 1,
+          "format": "pdf",
+          "updated": "2026",
+          "url": "assets/materiais/logica/2026-2/tabela-regras-deducao-natural.pdf",
+          "status": "published"
+        },
+        {
+          "id": "logica-50-exercicios-deducao-natural",
+          "type": "exercicios",
+          "title": "50 Exercícios de Dedução Natural",
+          "description": "Lista progressiva, do nível fácil ao muito difícil, com gabarito comentado linha a linha.",
+          "pages": 29,
+          "format": "pdf",
+          "updated": "2026",
+          "url": "assets/materiais/logica/2026-2/50-exercicios-deducao-natural.pdf",
+          "status": "published",
+          "related": [
+            {"label": "Tabela de Regras de Dedução Natural", "url": "assets/materiais/logica/2026-2/tabela-regras-deducao-natural.pdf"}
+          ]
+        }
+      ],
+      "semesters": [
+        {
+          "id": "2026-2",
+          "label": "2026/II",
+          "current": true,
+          "resources": [
+            {
+              "id": "logica-2026-2-introducao-unidade-1",
+              "type": "slides",
+              "title": "Introdução à Lógica — Da Ágora ao Algoritmo",
+              "description": "Unidade 1: percurso histórico e conceitual da lógica, de Aristóteles e Boole a Gödel e Turing.",
+              "class_label": "Unidade 1",
+              "pages": 35,
+              "format": "pdf",
+              "updated": "2026",
+              "url": "assets/materiais/logica/2026-2/introducao-a-logica-unidade-1.pdf",
+              "status": "published"
+            },
+            {
+              "id": "logica-2026-2-prova-g1-unidade-1",
+              "type": "avaliacao",
+              "title": "Avaliação de Grau 1 — Unidade 1",
+              "description": "Prova de Lógica para Computação com as versões A, B e C reunidas no mesmo documento.",
+              "class_label": "Grau 1",
+              "pages": 11,
+              "format": "pdf",
+              "updated": "2026",
+              "url": "assets/materiais/logica/2026-2/prova-g1-unidade-1-versoes-abc.pdf",
+              "status": "published"
+            },
+            {
+              "id": "logica-2026-2-gabarito-g1-unidade-1",
+              "type": "gabarito",
+              "title": "Gabarito comentado — Grau 1, Unidade 1",
+              "description": "Respostas comentadas das versões A, B e C, agrupadas por número de questão.",
+              "class_label": "Grau 1",
+              "pages": 6,
+              "format": "pdf",
+              "updated": "2026",
+              "url": "assets/materiais/logica/2026-2/gabarito-comentado-g1-unidade-1.pdf",
+              "status": "published",
+              "related": [
+                {"label": "Avaliação de Grau 1 — Unidade 1", "url": "assets/materiais/logica/2026-2/prova-g1-unidade-1-versoes-abc.pdf"}
+              ]
+            }
+          ]
+        },
+        {"id": "2026-1", "label": "2026/I", "current": false, "resources": []},
+        {"id": "2025-2", "label": "2025/II", "current": false, "resources": []},
+        {"id": "2025-1", "label": "2025/I", "current": false, "resources": []},
+        {"id": "2024-2", "label": "2024/II", "current": false, "resources": []}
+      ]
+    },
+    "introducao-computacao": {
+      "name": "Introdução à Computação",
+      "institution": "PUCRS",
+      "permanent_resources": [],
+      "semesters": [
+        {
+          "id": "2026-2",
+          "label": "2026/II",
+          "current": true,
+          "resources": [
+            {
+              "id": "intro-2026-2-codificacao-informacao",
+              "type": "slides",
+              "title": "Codificação da Informação",
+              "description": "Como textos, números e imagens são transformados em bits para processamento e armazenamento.",
+              "pages": 46,
+              "format": "pdf",
+              "updated": "2026",
+              "url": "assets/materiais/introducao-computacao/2026-2/codificacao-da-informacao.pdf",
+              "status": "published"
+            },
+            {
+              "id": "intro-2026-2-lista-50-exercicios",
+              "type": "exercicios",
+              "title": "Lista de Exercícios — 50 Questões",
+              "description": "Questões de múltipla escolha sobre codificação da informação e os demais fundamentos trabalhados no material, com gabarito comentado.",
+              "pages": 20,
+              "format": "pdf",
+              "updated": "2026",
+              "url": "assets/materiais/introducao-computacao/2026-2/lista-50-exercicios.pdf",
+              "status": "published",
+              "related": [
+                {"label": "Codificação da Informação", "url": "assets/materiais/introducao-computacao/2026-2/codificacao-da-informacao.pdf"}
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "sistemas-operacionais": {
+      "name": "Sistemas Operacionais",
+      "institution": "PUCRS",
+      "permanent_resources": [
+        {
+          "id": "so-simulador-paginacao",
+          "type": "ferramenta",
+          "title": "Simulador de substituição de páginas",
+          "description": "Compare FIFO, LRU, OPT e Clock passo a passo, com frames, hits, faltas e anomalia de Belady.",
+          "format": "web",
+          "updated": "2026",
+          "url": "simulador-paginacao.html",
+          "download": false,
+          "status": "published"
+        }
+      ],
+      "semesters": [
+        {"id": "2026-2", "label": "2026/II", "current": true, "resources": []}
+      ]
+    },
+    "gestao-projetos": {
+      "name": "Gestão de Projetos",
+      "institution": "UniLasalle",
+      "permanent_resources": [],
+      "semesters": [
+        {
+          "id": "2026-2",
+          "label": "2026/II",
+          "current": true,
+          "resources": [
+            {
+              "id": "gp-2026-2-gestao-tempo",
+              "type": "slides",
+              "title": "Gestão do Tempo em Projetos",
+              "description": "PMBOK 8 aplicado ao PIACA: atividades, dependências, estimativas, caminho crítico, folga, crashing, fast tracking e abordagem ágil.",
+              "pages": 19,
+              "format": "pdf",
+              "updated": "2026",
+              "url": "assets/materiais/gestao-projetos/2026-2/gestao-do-tempo.pdf",
+              "status": "published"
+            },
+            {
+              "id": "gp-2026-2-qualidade-estimativas",
+              "type": "slides",
+              "title": "Gerenciamento da Qualidade e Estimativas de Esforço",
+              "description": "PMBOK, Scrum e Kanban aplicados ao PIACA, incluindo Story Points, Planning Poker, throughput e cycle time.",
+              "pages": 45,
+              "format": "pdf",
+              "updated": "2026",
+              "url": "assets/materiais/gestao-projetos/2026-2/qualidade-e-estimativas-de-esforco.pdf",
+              "status": "published"
+            },
+            {
+              "id": "gp-2026-2-recursos-humanos",
+              "type": "slides",
+              "title": "Gerenciamento de Recursos Humanos",
+              "description": "PMBOK 8 e métodos ágeis: papéis, responsabilidades, liderança, motivação, conflitos, times de alto desempenho e métricas.",
+              "pages": 32,
+              "format": "pdf",
+              "updated": "2026",
+              "url": "assets/materiais/gestao-projetos/2026-2/recursos-humanos-pmbok8-agil.pdf",
+              "status": "published"
+            },
+            {
+              "id": "gp-2026-2-revisao-p1",
+              "type": "exercicios",
+              "title": "Lista de Exercícios — Revisão para P1",
+              "description": "Lista de revisão de Gestão de Projetos com questões de múltipla escolha sobre os tópicos trabalhados antes da P1.",
+              "pages": 15,
+              "format": "pdf",
+              "updated": "2026",
+              "url": "assets/materiais/gestao-projetos/2026-2/lista-revisao-p1.pdf",
+              "status": "published"
+            },
+            {
+              "id": "gp-2026-2-prova-p1",
+              "type": "avaliacao",
+              "title": "Prova P1 — Gestão de Projetos",
+              "description": "Avaliação P1 com 10 questões de múltipla escolha.",
+              "pages": 5,
+              "format": "pdf",
+              "updated": "2026",
+              "url": "assets/materiais/gestao-projetos/2026-2/prova-p1.pdf",
+              "status": "published"
+            }
+          ]
+        }
+      ]
+    },
+    "estruturas-dados": {
+      "name": "Estruturas de Dados",
+      "institution": "UniLasalle",
+      "permanent_resources": [],
+      "semesters": [
+        {
+          "id": "2026-2",
+          "label": "2026/II",
+          "current": true,
+          "resources": [
+            {
+              "id": "ed-2026-2-aula04-complexidade-slides",
+              "type": "slides",
+              "title": "Aula 4 — Desempenho de Algoritmos",
+              "description": "Contagem de operações, funções de custo e notações O, Ω e Θ, com análise de casos e famílias de crescimento.",
+              "class_label": "Grau 1 · Aula 4",
+              "pages": 49,
+              "format": "pdf",
+              "updated": "2026",
+              "url": "assets/materiais/estruturas-dados/2026-2/aula04-complexidade-slides.pdf",
+              "status": "published",
+              "related": [
+                {"label": "Apostila completa da Aula 4", "url": "assets/materiais/estruturas-dados/2026-2/apostila-aula04-complexidade.pdf"}
+              ]
+            },
+            {
+              "id": "ed-2026-2-aula04-complexidade-apostila",
+              "type": "apostila",
+              "title": "Apostila — Contagem de Operações e O, Ω e Θ",
+              "description": "Material de apoio aprofundado da Aula 4, com exemplos, exercícios resolvidos, matemática de apoio, Insertion Sort e atividade Campo Minado.",
+              "class_label": "Grau 1 · Aula 4",
+              "pages": 80,
+              "format": "pdf",
+              "updated": "2026",
+              "url": "assets/materiais/estruturas-dados/2026-2/apostila-aula04-complexidade.pdf",
+              "external_url": "https://github.com/ProfessorFilipo/EstruturasDados/tree/main/aula04-complexidade",
+              "status": "published",
+              "related": [
+                {"label": "Slides da Aula 4", "url": "assets/materiais/estruturas-dados/2026-2/aula04-complexidade-slides.pdf"}
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
