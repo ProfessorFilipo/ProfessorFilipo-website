@@ -28,7 +28,10 @@
           "url": "assets/materiais/logica/2026-2/50-exercicios-deducao-natural.pdf",
           "status": "published",
           "related": [
-            {"label": "Tabela de Regras de Dedução Natural", "url": "assets/materiais/logica/2026-2/tabela-regras-deducao-natural.pdf"}
+            {
+              "label": "Tabela de Regras de Dedução Natural",
+              "url": "assets/materiais/logica/2026-2/tabela-regras-deducao-natural.pdf"
+            }
           ]
         }
       ],
@@ -74,15 +77,38 @@
               "url": "assets/materiais/logica/2026-2/gabarito-comentado-g1-unidade-1.pdf",
               "status": "published",
               "related": [
-                {"label": "Avaliação de Grau 1 — Unidade 1", "url": "assets/materiais/logica/2026-2/prova-g1-unidade-1-versoes-abc.pdf"}
+                {
+                  "label": "Avaliação de Grau 1 — Unidade 1",
+                  "url": "assets/materiais/logica/2026-2/prova-g1-unidade-1-versoes-abc.pdf"
+                }
               ]
             }
           ]
         },
-        {"id": "2026-1", "label": "2026/I", "current": false, "resources": []},
-        {"id": "2025-2", "label": "2025/II", "current": false, "resources": []},
-        {"id": "2025-1", "label": "2025/I", "current": false, "resources": []},
-        {"id": "2024-2", "label": "2024/II", "current": false, "resources": []}
+        {
+          "id": "2026-1",
+          "label": "2026/I",
+          "current": false,
+          "resources": []
+        },
+        {
+          "id": "2025-2",
+          "label": "2025/II",
+          "current": false,
+          "resources": []
+        },
+        {
+          "id": "2025-1",
+          "label": "2025/I",
+          "current": false,
+          "resources": []
+        },
+        {
+          "id": "2024-2",
+          "label": "2024/II",
+          "current": false,
+          "resources": []
+        }
       ]
     },
     "introducao-computacao": {
@@ -117,7 +143,10 @@
               "url": "assets/materiais/introducao-computacao/2026-2/lista-50-exercicios.pdf",
               "status": "published",
               "related": [
-                {"label": "Codificação da Informação", "url": "assets/materiais/introducao-computacao/2026-2/codificacao-da-informacao.pdf"}
+                {
+                  "label": "Codificação da Informação",
+                  "url": "assets/materiais/introducao-computacao/2026-2/codificacao-da-informacao.pdf"
+                }
               ]
             }
           ]
@@ -135,13 +164,18 @@
           "description": "Compare FIFO, LRU, OPT e Clock passo a passo, com frames, hits, faltas e anomalia de Belady.",
           "format": "web",
           "updated": "2026",
-          "url": "simulador-paginacao.html",
+          "url": "/simulador-paginacao",
           "download": false,
           "status": "published"
         }
       ],
       "semesters": [
-        {"id": "2026-2", "label": "2026/II", "current": true, "resources": []}
+        {
+          "id": "2026-2",
+          "label": "2026/II",
+          "current": true,
+          "resources": []
+        }
       ]
     },
     "gestao-projetos": {
@@ -235,7 +269,10 @@
               "url": "assets/materiais/estruturas-dados/2026-2/aula04-complexidade-slides.pdf",
               "status": "published",
               "related": [
-                {"label": "Apostila completa da Aula 4", "url": "assets/materiais/estruturas-dados/2026-2/apostila-aula04-complexidade.pdf"}
+                {
+                  "label": "Apostila completa da Aula 4",
+                  "url": "assets/materiais/estruturas-dados/2026-2/apostila-aula04-complexidade.pdf"
+                }
               ]
             },
             {
@@ -251,7 +288,10 @@
               "external_url": "https://github.com/ProfessorFilipo/EstruturasDados/tree/main/aula04-complexidade",
               "status": "published",
               "related": [
-                {"label": "Slides da Aula 4", "url": "assets/materiais/estruturas-dados/2026-2/aula04-complexidade-slides.pdf"}
+                {
+                  "label": "Slides da Aula 4",
+                  "url": "assets/materiais/estruturas-dados/2026-2/aula04-complexidade-slides.pdf"
+                }
               ]
             }
           ]

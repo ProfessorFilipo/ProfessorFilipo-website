@@ -7,8 +7,24 @@
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
-<title>Sistemas Operacionais — Filipo Novo Mór</title>
-<meta name="description" content="Materiais de Sistemas Operacionais — PUCRS.">
+<title>Sistemas Operacionais: Memória, Paginação e Simuladores | Filipo Novo Mór</title>
+<meta name="description" content="Materiais de Sistemas Operacionais sobre memória, paginação e algoritmos de substituição, com simulador de FIFO, LRU, OPT e Clock.">
+<!-- SEO:START -->
+<link rel="canonical" href="https://filipomor.com/sistemas-operacionais">
+<meta property="og:site_name" content="Filipo Novo Mór">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Sistemas Operacionais: Memória, Paginação e Simuladores | Filipo Novo Mór">
+<meta property="og:description" content="Materiais de Sistemas Operacionais sobre memória, paginação e algoritmos de substituição, com simulador de FIFO, LRU, OPT e Clock.">
+<meta property="og:url" content="https://filipomor.com/sistemas-operacionais">
+<meta property="og:image" content="https://filipomor.com/assets/logo-photo.jpg">
+<meta property="og:image:alt" content="Filipo Novo Mór">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Sistemas Operacionais: Memória, Paginação e Simuladores | Filipo Novo Mór">
+<meta name="twitter:description" content="Materiais de Sistemas Operacionais sobre memória, paginação e algoritmos de substituição, com simulador de FIFO, LRU, OPT e Clock.">
+<meta name="twitter:image" content="https://filipomor.com/assets/logo-photo.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://filipomor.com/#website","url":"https://filipomor.com/","name":"Filipo Novo Mór","inLanguage":"pt-BR","publisher":{"@id":"https://filipomor.com/#person"}},{"@type":"Person","@id":"https://filipomor.com/#person","name":"Filipo Novo Mór","url":"https://filipomor.com/","image":"https://filipomor.com/assets/logo-photo.jpg"},{"@type":"WebPage","@id":"https://filipomor.com/sistemas-operacionais#webpage","url":"https://filipomor.com/sistemas-operacionais","name":"Sistemas Operacionais: Memória, Paginação e Simuladores | Filipo Novo Mór","description":"Materiais de Sistemas Operacionais sobre memória, paginação e algoritmos de substituição, com simulador de FIFO, LRU, OPT e Clock.","inLanguage":"pt-BR","isPartOf":{"@id":"https://filipomor.com/#website"},"about":{"@id":"https://filipomor.com/#person"}},{"@type":"BreadcrumbList","@id":"https://filipomor.com/sistemas-operacionais#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://filipomor.com/"},{"@type":"ListItem","position":2,"name":"Ensino","item":"https://filipomor.com/ensino"},{"@type":"ListItem","position":3,"name":"Disciplinas","item":"https://filipomor.com/ensino-disciplinas"},{"@type":"ListItem","position":4,"name":"Sistemas Operacionais","item":"https://filipomor.com/sistemas-operacionais"}]}]}</script>
+<!-- SEO:END -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/main.css?v=7">
@@ -18,25 +34,25 @@
 
   <header class="site-header">
     <nav class="main-nav" aria-label="Navegação principal">
-      <a href="sobre.html">SOBRE</a>
-      <a href="pesquisa.html">PESQUISA</a>
-      <a href="ensino.html">ENSINO</a>
-      <a href="ferramentas.html">FERRAMENTAS</a>
-      <a href="blog.html">BLOG</a>
-      <a href="contato.html">CONTATO</a>
+      <a href="/sobre">SOBRE</a>
+      <a href="/pesquisa">PESQUISA</a>
+      <a href="/ensino">ENSINO</a>
+      <a href="/ferramentas">FERRAMENTAS</a>
+      <a href="/blog">BLOG</a>
+      <a href="/contato">CONTATO</a>
     </nav>
     <div style="display:flex;align-items:center;gap:16px;">
       <div class="lang-switch">
         <span class="current">PT-BR</span><span class="sep">/</span><a href="#" title="Versão em inglês em breve">EN-CA</a>
       </div>
-      <a href="index.html" class="site-logo" aria-label="Filipo Novo Mór — página inicial">
+      <a href="/" class="site-logo" aria-label="Filipo Novo Mór — página inicial">
         <img src="assets/logo-photo.jpg" alt="Foto de Filipo com seu gato, o Alemão">
       </a>
     </div>
   </header>
 
   <div class="page-hero">
-    <p class="breadcrumb"><a href="index.html">INÍCIO</a><span class="sep">/</span><a href="ensino.html">ENSINO</a><span class="sep">/</span><a href="ensino-disciplinas.html">DISCIPLINAS</a><span class="sep">/</span>SISTEMAS OPERACIONAIS</p>
+    <p class="breadcrumb"><a href="/">INÍCIO</a><span class="sep">/</span><a href="/ensino">ENSINO</a><span class="sep">/</span><a href="/ensino-disciplinas">DISCIPLINAS</a><span class="sep">/</span>SISTEMAS OPERACIONAIS</p>
     <p class="eyebrow">PUCRS</p>
     <h1>Sistemas Operacionais</h1>
     <p>Fundamentos de sistemas operacionais: processos, concorrência, memória e paginação.</p>
@@ -49,21 +65,56 @@
       <img class="card-icon" src="assets/icon-chip.svg" alt="" aria-hidden="true">
       <h3>Simulador de substituição de páginas</h3>
       <p>Observe FIFO, LRU, OPT e Clock em paralelo: frames, hits, faltas e justificativas de cada decisão.</p>
-      <div class="link-row"><a class="btn primary" href="simulador-paginacao.html">ABRIR SIMULADOR</a></div>
+      <div class="link-row"><a class="btn primary" href="/simulador-paginacao">ABRIR SIMULADOR</a></div>
     </div>
     <div class="teaching-intro">
       <h2>MATERIAIS DA DISCIPLINA</h2>
       <p>Conteúdo organizado por semestre e por tipo de recurso. Materiais permanentes permanecem disponíveis independentemente da turma em andamento.</p>
     </div>
-    <section data-materials-root data-discipline="sistemas-operacionais" aria-live="polite">
-      <div class="material-empty">Carregando catálogo de materiais…</div>
-    </section>
-  </main>
+    <section data-materials-root data-discipline="sistemas-operacionais" aria-live="polite" data-prerendered="true">
+<!-- MATERIALS:GENERATED:START -->
+<div class="teaching-summary-grid" aria-label="Organização dos materiais">
+  <div class="teaching-summary-card"><strong>AULAS</strong><span>Slides, apostilas e referências agrupados pela disciplina e pelo semestre.</span></div>
+  <div class="teaching-summary-card"><strong>PRÁTICA</strong><span>Listas de exercícios, revisões, atividades e ferramentas relacionadas.</span></div>
+  <div class="teaching-summary-card"><strong>AVALIAÇÕES</strong><span>Provas e gabaritos aparecem somente quando marcados como públicos.</span></div>
+</div>
 
-  <footer class="api-status">
-    <span id="api-status-text">Verificando conexão com a API…</span>
-  </footer>
-  <script src="js/api.js"></script>
-  <script src="js/materials.js?v=1"></script>
+<section class="material-section material-permanent" data-permanent-section>
+  <div class="material-section-head"><h3>BIBLIOTECA DA DISCIPLINA</h3><span>conteúdo permanente</span></div>
+  <div class="material-grid">
+<article class="material-card" data-type="ferramenta">
+  <div class="material-card-top"><span class="material-type">FERRAMENTA</span></div>
+  <h4 class="material-card-title">Simulador de substituição de páginas</h4>
+  <p class="material-card-desc">Compare FIFO, LRU, OPT e Clock passo a passo, com frames, hits, faltas e anomalia de Belady.</p>
+  <div class="material-meta"><span>WEB</span><span>Atualizado 2026</span></div>
+  <div class="material-actions"><a class="btn primary" href="/simulador-paginacao" target="_blank" rel="noopener">VISUALIZAR</a></div>
+  
+</article>
+  </div>
+</section>
+
+<div class="material-toolbar">
+  <h2>MATERIAIS POR SEMESTRE</h2>
+  <span class="material-count">1 recurso público</span>
+</div>
+
+<div class="material-semesters" role="tablist" aria-label="Semestres">
+  <button type="button" class="material-semester-btn active" data-semester="2026-2" role="tab" aria-selected="true" aria-controls="materials-semester-2026-2">2026/II<span class="current-dot" title="Semestre atual"></span></button>
+</div>
+
+<div class="material-filters" aria-label="Filtrar por tipo de material">
+  <button type="button" class="material-filter active" data-filter="all">TODOS</button> <button type="button" class="material-filter" data-filter="slides">SLIDES</button> <button type="button" class="material-filter" data-filter="apostila">APOSTILA</button> <button type="button" class="material-filter" data-filter="referencia">REFERÊNCIA</button> <button type="button" class="material-filter" data-filter="exercicios">EXERCÍCIOS</button> <button type="button" class="material-filter" data-filter="avaliacao">AVALIAÇÃO</button> <button type="button" class="material-filter" data-filter="gabarito">GABARITO</button> <button type="button" class="material-filter" data-filter="ferramenta">FERRAMENTA</button> <button type="button" class="material-filter" data-filter="outros">OUTROS</button>
+</div>
+
+<div data-semester-content>
+<div class="material-semester-panel" id="materials-semester-2026-2" data-semester-panel="2026-2" role="tabpanel">
+<div class="material-empty">Nenhum material público foi cadastrado para este período ainda.</div>
+</div>
+</div>
+<p class="teaching-note">O ambiente institucional (Moodle/Blackboard) continua sendo a referência oficial para notas, entregas e comunicados. Esta página organiza materiais didáticos e recursos de estudo.</p>
+<!-- MATERIALS:GENERATED:END -->
+</section>
+  </main>
+<script src="js/materials.js?v=2"></script>
 </body>
 </html>

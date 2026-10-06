@@ -7,8 +7,24 @@
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
-<title>Estruturas de Dados — Filipo Novo Mór</title>
-<meta name="description" content="Materiais de Estruturas de Dados — UNILASALLE · EAD.">
+<title>Estruturas de Dados: Complexidade, O, Ω e Θ | Filipo Novo Mór</title>
+<meta name="description" content="Materiais de Estruturas de Dados sobre análise de algoritmos, contagem de operações, complexidade O, Ω e Θ, exercícios e atividades práticas.">
+<!-- SEO:START -->
+<link rel="canonical" href="https://filipomor.com/estruturas-dados">
+<meta property="og:site_name" content="Filipo Novo Mór">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Estruturas de Dados: Complexidade, O, Ω e Θ | Filipo Novo Mór">
+<meta property="og:description" content="Materiais de Estruturas de Dados sobre análise de algoritmos, contagem de operações, complexidade O, Ω e Θ, exercícios e atividades práticas.">
+<meta property="og:url" content="https://filipomor.com/estruturas-dados">
+<meta property="og:image" content="https://filipomor.com/assets/logo-photo.jpg">
+<meta property="og:image:alt" content="Filipo Novo Mór">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Estruturas de Dados: Complexidade, O, Ω e Θ | Filipo Novo Mór">
+<meta name="twitter:description" content="Materiais de Estruturas de Dados sobre análise de algoritmos, contagem de operações, complexidade O, Ω e Θ, exercícios e atividades práticas.">
+<meta name="twitter:image" content="https://filipomor.com/assets/logo-photo.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://filipomor.com/#website","url":"https://filipomor.com/","name":"Filipo Novo Mór","inLanguage":"pt-BR","publisher":{"@id":"https://filipomor.com/#person"}},{"@type":"Person","@id":"https://filipomor.com/#person","name":"Filipo Novo Mór","url":"https://filipomor.com/","image":"https://filipomor.com/assets/logo-photo.jpg"},{"@type":"WebPage","@id":"https://filipomor.com/estruturas-dados#webpage","url":"https://filipomor.com/estruturas-dados","name":"Estruturas de Dados: Complexidade, O, Ω e Θ | Filipo Novo Mór","description":"Materiais de Estruturas de Dados sobre análise de algoritmos, contagem de operações, complexidade O, Ω e Θ, exercícios e atividades práticas.","inLanguage":"pt-BR","isPartOf":{"@id":"https://filipomor.com/#website"},"about":{"@id":"https://filipomor.com/#person"}},{"@type":"BreadcrumbList","@id":"https://filipomor.com/estruturas-dados#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://filipomor.com/"},{"@type":"ListItem","position":2,"name":"Ensino","item":"https://filipomor.com/ensino"},{"@type":"ListItem","position":3,"name":"Disciplinas","item":"https://filipomor.com/ensino-disciplinas"},{"@type":"ListItem","position":4,"name":"Estruturas de Dados","item":"https://filipomor.com/estruturas-dados"}]}]}</script>
+<!-- SEO:END -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/main.css?v=7">
@@ -18,25 +34,25 @@
 
   <header class="site-header">
     <nav class="main-nav" aria-label="Navegação principal">
-      <a href="sobre.html">SOBRE</a>
-      <a href="pesquisa.html">PESQUISA</a>
-      <a href="ensino.html">ENSINO</a>
-      <a href="ferramentas.html">FERRAMENTAS</a>
-      <a href="blog.html">BLOG</a>
-      <a href="contato.html">CONTATO</a>
+      <a href="/sobre">SOBRE</a>
+      <a href="/pesquisa">PESQUISA</a>
+      <a href="/ensino">ENSINO</a>
+      <a href="/ferramentas">FERRAMENTAS</a>
+      <a href="/blog">BLOG</a>
+      <a href="/contato">CONTATO</a>
     </nav>
     <div style="display:flex;align-items:center;gap:16px;">
       <div class="lang-switch">
         <span class="current">PT-BR</span><span class="sep">/</span><a href="#" title="Versão em inglês em breve">EN-CA</a>
       </div>
-      <a href="index.html" class="site-logo" aria-label="Filipo Novo Mór — página inicial">
+      <a href="/" class="site-logo" aria-label="Filipo Novo Mór — página inicial">
         <img src="assets/logo-photo.jpg" alt="Foto de Filipo com seu gato, o Alemão">
       </a>
     </div>
   </header>
 
   <div class="page-hero">
-    <p class="breadcrumb"><a href="index.html">INÍCIO</a><span class="sep">/</span><a href="ensino.html">ENSINO</a><span class="sep">/</span><a href="ensino-disciplinas.html">DISCIPLINAS</a><span class="sep">/</span>ESTRUTURAS DE DADOS</p>
+    <p class="breadcrumb"><a href="/">INÍCIO</a><span class="sep">/</span><a href="/ensino">ENSINO</a><span class="sep">/</span><a href="/ensino-disciplinas">DISCIPLINAS</a><span class="sep">/</span>ESTRUTURAS DE DADOS</p>
     <p class="eyebrow">UNILASALLE · EAD</p>
     <h1>Estruturas de Dados</h1>
     <p>Estruturas lineares, análise de algoritmos e complexidade, com exemplos, exercícios e atividades práticas.</p>
@@ -49,15 +65,63 @@
       <h2>MATERIAIS DA DISCIPLINA</h2>
       <p>Conteúdo organizado por semestre e por tipo de recurso. Materiais permanentes permanecem disponíveis independentemente da turma em andamento.</p>
     </div>
-    <section data-materials-root data-discipline="estruturas-dados" aria-live="polite">
-      <div class="material-empty">Carregando catálogo de materiais…</div>
-    </section>
-  </main>
+    <section data-materials-root data-discipline="estruturas-dados" aria-live="polite" data-prerendered="true">
+<!-- MATERIALS:GENERATED:START -->
+<div class="teaching-summary-grid" aria-label="Organização dos materiais">
+  <div class="teaching-summary-card"><strong>AULAS</strong><span>Slides, apostilas e referências agrupados pela disciplina e pelo semestre.</span></div>
+  <div class="teaching-summary-card"><strong>PRÁTICA</strong><span>Listas de exercícios, revisões, atividades e ferramentas relacionadas.</span></div>
+  <div class="teaching-summary-card"><strong>AVALIAÇÕES</strong><span>Provas e gabaritos aparecem somente quando marcados como públicos.</span></div>
+</div>
 
-  <footer class="api-status">
-    <span id="api-status-text">Verificando conexão com a API…</span>
-  </footer>
-  <script src="js/api.js"></script>
-  <script src="js/materials.js?v=1"></script>
+
+
+<div class="material-toolbar">
+  <h2>MATERIAIS POR SEMESTRE</h2>
+  <span class="material-count">2 recursos públicos</span>
+</div>
+
+<div class="material-semesters" role="tablist" aria-label="Semestres">
+  <button type="button" class="material-semester-btn active" data-semester="2026-2" role="tab" aria-selected="true" aria-controls="materials-semester-2026-2">2026/II<span class="current-dot" title="Semestre atual"></span></button>
+</div>
+
+<div class="material-filters" aria-label="Filtrar por tipo de material">
+  <button type="button" class="material-filter active" data-filter="all">TODOS</button> <button type="button" class="material-filter" data-filter="slides">SLIDES</button> <button type="button" class="material-filter" data-filter="apostila">APOSTILA</button> <button type="button" class="material-filter" data-filter="referencia">REFERÊNCIA</button> <button type="button" class="material-filter" data-filter="exercicios">EXERCÍCIOS</button> <button type="button" class="material-filter" data-filter="avaliacao">AVALIAÇÃO</button> <button type="button" class="material-filter" data-filter="gabarito">GABARITO</button> <button type="button" class="material-filter" data-filter="ferramenta">FERRAMENTA</button> <button type="button" class="material-filter" data-filter="outros">OUTROS</button>
+</div>
+
+<div data-semester-content>
+<div class="material-semester-panel" id="materials-semester-2026-2" data-semester-panel="2026-2" role="tabpanel">
+<section class="material-section" data-material-section>
+  <div class="material-section-head"><h3>SLIDES</h3><span>1 item</span></div>
+  <div class="material-grid">
+<article class="material-card" data-type="slides">
+  <div class="material-card-top"><span class="material-type">SLIDES</span></div>
+  <h4 class="material-card-title">Aula 4 — Desempenho de Algoritmos</h4>
+  <p class="material-card-desc">Contagem de operações, funções de custo e notações O, Ω e Θ, com análise de casos e famílias de crescimento.</p>
+  <div class="material-meta"><span>Grau 1 · Aula 4</span><span>49 páginas</span><span>PDF</span><span>Atualizado 2026</span></div>
+  <div class="material-actions"><a class="btn primary" href="assets/materiais/estruturas-dados/2026-2/aula04-complexidade-slides.pdf" target="_blank" rel="noopener">VISUALIZAR</a><a class="btn ghost" href="assets/materiais/estruturas-dados/2026-2/aula04-complexidade-slides.pdf" download>BAIXAR</a></div>
+  <div class="material-related">Relacionado: <a href="assets/materiais/estruturas-dados/2026-2/apostila-aula04-complexidade.pdf">Apostila completa da Aula 4</a></div>
+</article>
+  </div>
+</section>
+<section class="material-section" data-material-section>
+  <div class="material-section-head"><h3>APOSTILA</h3><span>1 item</span></div>
+  <div class="material-grid">
+<article class="material-card" data-type="apostila">
+  <div class="material-card-top"><span class="material-type">APOSTILA</span></div>
+  <h4 class="material-card-title">Apostila — Contagem de Operações e O, Ω e Θ</h4>
+  <p class="material-card-desc">Material de apoio aprofundado da Aula 4, com exemplos, exercícios resolvidos, matemática de apoio, Insertion Sort e atividade Campo Minado.</p>
+  <div class="material-meta"><span>Grau 1 · Aula 4</span><span>80 páginas</span><span>PDF</span><span>Atualizado 2026</span></div>
+  <div class="material-actions"><a class="btn primary" href="assets/materiais/estruturas-dados/2026-2/apostila-aula04-complexidade.pdf" target="_blank" rel="noopener">VISUALIZAR</a><a class="btn ghost" href="assets/materiais/estruturas-dados/2026-2/apostila-aula04-complexidade.pdf" download>BAIXAR</a><a class="btn ghost" href="https://github.com/ProfessorFilipo/EstruturasDados/tree/main/aula04-complexidade" target="_blank" rel="noopener">LINK EXTERNO ↗</a></div>
+  <div class="material-related">Relacionado: <a href="assets/materiais/estruturas-dados/2026-2/aula04-complexidade-slides.pdf">Slides da Aula 4</a></div>
+</article>
+  </div>
+</section>
+</div>
+</div>
+<p class="teaching-note">O ambiente institucional (Moodle/Blackboard) continua sendo a referência oficial para notas, entregas e comunicados. Esta página organiza materiais didáticos e recursos de estudo.</p>
+<!-- MATERIALS:GENERATED:END -->
+</section>
+  </main>
+<script src="js/materials.js?v=2"></script>
 </body>
 </html>
