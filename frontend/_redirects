@@ -1,0 +1,25 @@
+# Permanent redirects from legacy .html URLs to canonical extensionless URLs.
+# Cloudflare Workers Static Assets parses this file before serving assets.
+/index.html / 301
+/autoavaliacao.html /autoavaliacao 301
+/contato.html /contato 301
+/editor-tabelas-c.html /editor-tabelas-c 301
+/ensino-disciplinas.html /ensino-disciplinas 301
+/ensino-materiais-anteriores.html /ensino-materiais-anteriores 301
+/ensino-tcc.html /ensino-tcc 301
+/ensino.html /ensino 301
+/estruturas-dados.html /estruturas-dados 301
+/experiencia.html /experiencia 301
+/ferramentas.html /ferramentas 301
+/fundamentos-computacao.html /fundamentos-computacao 301
+/gestao-projetos.html /gestao-projetos 301
+/introducao-computacao.html /introducao-computacao 301
+/logica-mor.html /logica-mor 301
+/logica.html /logica 301
+/pesquisa.html /pesquisa 301
+/praticas-engenharia-software.html /praticas-engenharia-software 301
+/projeto-integrador-ads.html /projeto-integrador-ads 301
+/projeto-integrador-inovacao.html /projeto-integrador-inovacao 301
+/simulador-paginacao.html /simulador-paginacao 301
+/sistemas-operacionais.html /sistemas-operacionais 301
+/sobre.html /sobre 301
